@@ -76,6 +76,21 @@ make stop
 make test-all
 ```
 
+### Releases
+
+```bash
+make build-python-packages
+make update-release-manifest
+make check-version-sync
+```
+
+- Release automation: `.github/workflows/release-on-main.yml`
+- Publish workflow (approval gated): `.github/workflows/publish-release.yml`
+- Release config: `release/components.yaml`
+- Platform manifest: `manifest.yaml`
+- Pending release notes: `.changes/`
+- Playbook: `docs/release-playbook.md`
+
 ## 📈 Optional Monitoring (Local)
 
 ```bash

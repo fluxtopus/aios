@@ -1,0 +1,152 @@
+name: Prepare Release PR
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: release-pr-main
+  cancel-in-progress: false
+
+jobs:
+  prepare-release-pr:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install release dependencies
+        shell: bash
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pyyaml
+
+      - name: Compute bump plan from pending change notes
+        shell: bash
+        run: |
+          ./scripts/release/compute-bumps-from-changes.sh \
+            --config release/components.yaml \
+            --changes-dir .changes \
+            --output /tmp/bump-plan.json
+
+      - name: Plan metadata
+        id: plan
+        shell: bash
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          plan = json.loads(Path('/tmp/bump-plan.json').read_text(encoding='utf-8'))
+          has_changes = 'true' if plan.get('components') else 'false'
+          print(f"has_changes={has_changes}")
+          PY
+
+      - name: Stop when no pending notes
+        if: steps.plan.outputs.has_changes != 'true'
+        shell: bash
+        run: |
+          echo "No pending .changes notes found; skipping release PR generation."
+          exit 0
+
+      - name: Apply version bumps
+        if: steps.plan.outputs.has_changes == 'true'
+        shell: bash
+        run: |
+          ./scripts/release/bump-versions.sh \
+            --config release/components.yaml \
+            --plan /tmp/bump-plan.json \
+            --output /tmp/version-files.json
+
+      - name: Update platform manifest
+        if: steps.plan.outputs.has_changes == 'true'
+        shell: bash
+        run: |
+          ./scripts/release/update-manifest.sh \
+            --config release/components.yaml \
+            --output manifest.yaml
+
+      - name: Finalize release metadata
+        if: steps.plan.outputs.has_changes == 'true'
+        shell: bash
+        run: |
+          ./scripts/release/finalize-release.sh \
+            --plan /tmp/bump-plan.json \
+            --manifest manifest.yaml \
+            --changes-dir .changes \
+            --changelog releases/CHANGELOG.md \
+            --archive-root releases/notes \
+            --release-plan-output release/latest-release-plan.json
+
+      - name: Validate version sync
+        if: steps.plan.outputs.has_changes == 'true'
+        shell: bash
+        run: |
+          ./scripts/release/check-version-sync.sh \
+            --config release/components.yaml \
+            --manifest manifest.yaml
+
+      - name: Read platform release id
+        if: steps.plan.outputs.has_changes == 'true'
+        id: platform
+        shell: bash
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from pathlib import Path
+          import yaml
+
+          manifest = yaml.safe_load(Path('manifest.yaml').read_text(encoding='utf-8'))
+          print(f"platform_release={manifest['platform_release']}")
+          PY
+
+      - name: Create release pull request
+        if: steps.plan.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: release/auto-${{ github.run_id }}
+          delete-branch: true
+          title: "chore(release): prepare ${{ steps.platform.outputs.platform_release }}"
+          commit-message: "chore(release): prepare ${{ steps.platform.outputs.platform_release }}"
+          body: |
+            ## What
+            Automated release preparation from pending `.changes` notes.
+
+            ## Why
+            Keep component versions, changelog, and platform manifest consistent before publish.
+
+            ## How to test
+            - Verify `.changes` notes were archived to `releases/notes/`.
+            - Verify version bumps and `manifest.yaml` match expected components.
+            - Run `./scripts/release/check-version-sync.sh --config release/components.yaml --manifest manifest.yaml`.
+
+            ## Checklist
+            - [x] Version bumps applied from `.changes` notes
+            - [x] `manifest.yaml` refreshed
+            - [x] `releases/CHANGELOG.md` updated
+            - [x] `release/latest-release-plan.json` generated
+          labels: release
+          add-paths: |
+            manifest.yaml
+            release/latest-release-plan.json
+            releases/CHANGELOG.md
+            releases/notes/**
+            apps/*/VERSION
+            packages/**/pyproject.toml
+            packages/**/setup.py
+            packages/**/package.json
+            packages/**/version.py
+            packages/**/__init__.py
+            .changes/**
