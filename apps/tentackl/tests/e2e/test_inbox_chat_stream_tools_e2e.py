@@ -19,6 +19,15 @@ from typing import Any, Dict, List, Optional
 import httpx
 import pytest
 
+_RUN_LOCAL_E2E = os.environ.get("RUN_LOCAL_E2E", "").lower() in {"1", "true", "yes"}
+pytestmark = [
+    pytest.mark.e2e,
+    pytest.mark.skipif(
+        not _RUN_LOCAL_E2E,
+        reason="Local-only E2E test. Set RUN_LOCAL_E2E=1 to execute.",
+    ),
+]
+
 
 def _get_default_inkpass_url() -> str:
     try:
