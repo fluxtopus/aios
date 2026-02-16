@@ -49,7 +49,7 @@ def upgrade() -> None:
     """)
     op.execute("""
         CREATE TYPE destination_service_enum AS ENUM (
-            'tentackl', 'custom'
+            'tentacle', 'custom'
         )
     """)
     op.execute("""
@@ -116,9 +116,9 @@ def upgrade() -> None:
         sa.Column('signature_secret', sa.Text(), nullable=True),
         sa.Column('event_filters', sa.JSON(), nullable=True),
         sa.Column('transform_template', sa.Text(), nullable=True),
-        sa.Column('destination_service', postgresql.ENUM('tentackl', 'custom',
+        sa.Column('destination_service', postgresql.ENUM('tentacle', 'custom',
                                                           name='destination_service_enum', create_type=False),
-                  nullable=False, server_default='tentackl'),
+                  nullable=False, server_default='tentacle'),
         sa.Column('destination_config', sa.JSON(), nullable=True),
         sa.Column('is_active', sa.Boolean(), server_default='true'),
         sa.Column('created_at', sa.DateTime(), server_default=sa.func.now()),

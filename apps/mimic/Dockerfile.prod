@@ -2,7 +2,7 @@
 # Multi-stage build for optimal image size
 
 # Stage 1: Builder
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
@@ -23,6 +23,10 @@ RUN pip install --user --no-cache-dir gunicorn
 FROM python:3.11-slim
 
 WORKDIR /app
+
+LABEL org.opencontainers.image.source="https://github.com/fluxtopus/aios" \
+      org.opencontainers.image.description="Unified message gateway for outbound notifications and inbound webhooks." \
+      org.opencontainers.image.licenses="MIT"
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \

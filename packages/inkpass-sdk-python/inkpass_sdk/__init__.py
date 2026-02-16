@@ -69,7 +69,7 @@ from .permissions import PermissionChecker, create_permission_checker
 from .dev_permissions import (
     ALL_PERMISSIONS,
     ROLE_PRESETS,
-    TENTACKL_PERMISSIONS,
+    TENTACLE_PERMISSIONS,
     MIMIC_PERMISSIONS,
     AIOS_PERMISSIONS,
     INKPASS_PERMISSIONS,
@@ -90,7 +90,7 @@ __all__ = [
     # Permission Definitions
     "ALL_PERMISSIONS",
     "ROLE_PRESETS",
-    "TENTACKL_PERMISSIONS",
+    "TENTACLE_PERMISSIONS",
     "MIMIC_PERMISSIONS",
     "AIOS_PERMISSIONS",
     "INKPASS_PERMISSIONS",

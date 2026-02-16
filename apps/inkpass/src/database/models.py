@@ -528,13 +528,13 @@ class PermissionTemplate(Base):
     Global permission template registry (not org-scoped).
 
     Templates define permission sets for different product types
-    (TENTACKL_SOLO, MIMIC_SOLO, INKPASS_SOLO, AIOS_BUNDLE).
+    (TENTACLE_SOLO, MIMIC_SOLO, INKPASS_SOLO, AIOS_BUNDLE).
     Templates are defined in code and synced to DB via admin API.
     """
     __tablename__ = "permission_templates"
 
     id = Column(String, primary_key=True, default=generate_id)
-    name = Column(String, unique=True, nullable=False)  # e.g., "TENTACKL_SOLO"
+    name = Column(String, unique=True, nullable=False)  # e.g., "TENTACLE_SOLO"
     product_type = Column(String, nullable=False)  # Maps to ProductType enum
     version = Column(sa.Integer, nullable=False, default=1)
     description = Column(Text, nullable=True)

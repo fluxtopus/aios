@@ -7,7 +7,7 @@ from typing import Annotated, Optional
 from src.database.database import get_db
 from src.database.models import DeliveryLog
 from src.api.auth import require_permission, AuthContext
-from src.clients.tentackl_client import TentacklClient
+from src.clients.tentacle_client import TentacleClient
 from src.services.dev_email_service import dev_email_service
 from src.services.postmark_email_service import postmark_email_service
 from src.services.resend_email_service import resend_email_service
@@ -230,10 +230,10 @@ async def send_notification(
                     detail=f"Failed to send notification via Resend: {str(e)}"
                 )
 
-    # Default/Tentackl path: Send via Tentackl workflow (for non-email or EMAIL_PROVIDER=tentackl)
+    # Default/Tentacle path: Send via Tentacle workflow (for non-email or EMAIL_PROVIDER=tentacle)
     try:
-        tentackl_client = TentacklClient()
-        await tentackl_client.send_notification(
+        tentacle_client = TentacleClient()
+        await tentacle_client.send_notification(
             user_id=auth.user_id,
             recipient=request.recipient,
             content=request.content,

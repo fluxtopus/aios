@@ -4,7 +4,7 @@ Celery tasks for webhook event routing.
 Routes webhook events from Mimic gateway to downstream services:
 - InkPass: Billing and subscription state
 - Mimic: Email delivery tracking
-- Tentackl/Custom: Integration event routing (INT-012)
+- Tentacle/Custom: Integration event routing (INT-012)
 """
 
 import httpx
@@ -385,7 +385,7 @@ def route_integration_event(
     """Route an integration webhook event to its destination service.
 
     Supports routing to:
-    - tentackl: POST to Tentackl's internal event receiver
+    - tentacle: POST to Tentacle's internal event receiver
     - custom: POST to a user-configured webhook URL
     """
     db = get_db_session()
@@ -418,8 +418,8 @@ def route_integration_event(
         if settings.MIMIC_SERVICE_API_KEY:
             headers["X-Internal-Key"] = settings.MIMIC_SERVICE_API_KEY
 
-        if destination_service == "tentackl":
-            url = f"{settings.TENTACKL_INTERNAL_URL}/api/internal/integration-events"
+        if destination_service == "tentacle":
+            url = f"{settings.TENTACLE_INTERNAL_URL}/api/internal/integration-events"
         elif destination_service == "custom":
             url = destination_config.get("webhook_url")
             if not url:

@@ -1,12 +1,12 @@
-# Standalone Tentackl — no InkPass, no Mimic
+# Standalone Tentacle — no InkPass, no Mimic
 #
 # Usage:
 #   cp .env.standalone.example .env.standalone
 #   docker compose -f docker-compose.standalone.yml up -d
 #
-# This runs Tentackl with local auth (API key + local JWT).
+# This runs Tentacle with local auth (API key + local JWT).
 # Authenticate with:
-#   curl -H "X-API-Key: <your TENTACKL_API_KEY>" http://localhost:${TENTACKL_API_PORT:-8000}/api/health
+#   curl -H "X-API-Key: <your TENTACLE_API_KEY>" http://localhost:${TENTACLE_API_PORT:-8000}/api/health
 
 name: aios-standalone
 
@@ -16,46 +16,46 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: tentackl
+      POSTGRES_DB: tentacle
     ports:
-      - "${TENTACKL_POSTGRES_PORT:-5432}:5432"
+      - "${TENTACLE_POSTGRES_PORT:-5432}:5432"
     volumes:
-      - tentackl_postgres_data:/var/lib/postgresql/data
+      - tentacle_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - tentackl-network
+      - tentacle-network
 
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes
     ports:
-      - "${TENTACKL_REDIS_PORT:-6379}:6379"
+      - "${TENTACLE_REDIS_PORT:-6379}:6379"
     volumes:
-      - tentackl_redis_data:/data
+      - tentacle_redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - tentackl-network
+      - tentacle-network
 
-  tentackl:
+  tentacle:
     build:
       context: .
-      dockerfile: ./apps/tentackl/Dockerfile
+      dockerfile: ./apps/tentacle/Dockerfile
     command: ./start.sh
     ports:
-      - "${TENTACKL_API_PORT:-8000}:8000"
+      - "${TENTACLE_API_PORT:-8000}:8000"
     env_file:
       - .env.standalone.example
     environment:
       - APP_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tentackl
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tentacle
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
@@ -64,13 +64,13 @@ services:
       # No Mimic — notifications disabled
       - MIMIC_URL=
     volumes:
-      - ./apps/tentackl/src:/app/src
-      - ./apps/tentackl/tests:/app/tests
-      - ./apps/tentackl/config:/app/config
-      - ./apps/tentackl/configs:/app/configs
-      - ./apps/tentackl/logs:/app/logs
-      - ./apps/tentackl/scripts:/app/scripts
-      - ./apps/tentackl/alembic:/app/alembic
+      - ./apps/tentacle/src:/app/src
+      - ./apps/tentacle/tests:/app/tests
+      - ./apps/tentacle/config:/app/config
+      - ./apps/tentacle/configs:/app/configs
+      - ./apps/tentacle/logs:/app/logs
+      - ./apps/tentacle/scripts:/app/scripts
+      - ./apps/tentacle/alembic:/app/alembic
     depends_on:
       postgres:
         condition: service_healthy
@@ -83,12 +83,12 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - tentackl-network
+      - tentacle-network
 
 volumes:
-  tentackl_postgres_data:
-  tentackl_redis_data:
+  tentacle_postgres_data:
+  tentacle_redis_data:
 
 networks:
-  tentackl-network:
+  tentacle-network:
     driver: bridge

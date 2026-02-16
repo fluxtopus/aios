@@ -16,7 +16,7 @@ scrape_configs:
     relabel_configs:
       # Only collect logs from aios containers
       - source_labels: ['__meta_docker_container_name']
-        regex: '/(aios-.*|monorepo-.*|tentackl-ui)'
+        regex: '/(aios-.*|monorepo-.*|tentacle-ui)'
         action: keep
       # Use container name as label
       - source_labels: ['__meta_docker_container_name']

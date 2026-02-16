@@ -63,8 +63,8 @@ def test_complete_notification_flow(client, db_session):
     )
     assert provider_response.status_code == 200
     
-    # 6. Send notification (mocked Tentackl)
-    with patch('src.clients.tentackl_client.TentacklClient.send_notification') as mock_send:
+    # 6. Send notification (mocked Tentacle)
+    with patch('src.clients.tentacle_client.TentacleClient.send_notification') as mock_send:
         mock_send.return_value = AsyncMock(return_value="workflow-123")
         
         send_response = client.post(
@@ -120,7 +120,7 @@ def test_workflow_creation_and_trigger(client, test_user_annual, db_session):
     workflow_id = workflow_data["id"]
     
     # Trigger workflow
-    with patch('src.clients.tentackl_client.TentacklClient.trigger_workflow') as mock_trigger:
+    with patch('src.clients.tentacle_client.TentacleClient.trigger_workflow') as mock_trigger:
         mock_trigger.return_value = AsyncMock(return_value="workflow-run-123")
         
         trigger_response = client.post(

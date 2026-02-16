@@ -1,12 +1,12 @@
-"""Workflow compiler service - converts visual workflow JSON to Tentackl spec"""
+"""Workflow compiler service - converts visual workflow JSON to Tentacle spec"""
 
 from typing import Dict, Any, List
 
 class WorkflowCompiler:
-    """Service for compiling visual workflow definitions to Tentackl workflow specs"""
+    """Service for compiling visual workflow definitions to Tentacle workflow specs"""
     
     def compile(self, workflow_definition: Dict[str, Any]) -> Dict[str, Any]:
-        """Compile a visual workflow definition to Tentackl workflow spec format"""
+        """Compile a visual workflow definition to Tentacle workflow spec format"""
         # Extract workflow metadata
         name = workflow_definition.get("name", "notification_workflow")
         description = workflow_definition.get("description", "")
@@ -16,8 +16,8 @@ class WorkflowCompiler:
         # Build workflow steps from nodes and edges
         steps = self._build_steps(nodes, edges)
         
-        # Create Tentackl workflow spec
-        tentackl_spec = {
+        # Create Tentacle workflow spec
+        tentacle_spec = {
             "name": name,
             "description": description,
             "version": "1.0",
@@ -25,7 +25,7 @@ class WorkflowCompiler:
             "steps": steps
         }
         
-        return tentackl_spec
+        return tentacle_spec
     
     def _extract_inputs(self, nodes: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Extract input definitions from workflow nodes"""
@@ -93,7 +93,7 @@ class WorkflowCompiler:
                 self._traverse_node(target_node, node_map, edges, steps, visited)
     
     def _node_to_step(self, node: Dict[str, Any]) -> Dict[str, Any]:
-        """Convert a workflow node to a Tentackl workflow step"""
+        """Convert a workflow node to a Tentacle workflow step"""
         node_type = node.get("type")
         
         if node_type == "trigger":

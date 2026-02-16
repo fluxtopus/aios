@@ -1,4 +1,4 @@
-"""Full end-to-end test: Mimic API → Tentackl → Discord Mock Server"""
+"""Full end-to-end test: Mimic API → Tentacle → Discord Mock Server"""
 
 import pytest
 import asyncio
@@ -19,8 +19,8 @@ async def test_full_flow_mimic_to_discord(client, test_user_annual, db_session):
     Full end-to-end test:
     1. Mimic API receives notification request
     2. Mimic retrieves and decrypts provider key
-    3. Mimic calls Tentackl with provider credentials
-    4. Tentackl's NotifierAgent uses DiscordProvider
+    3. Mimic calls Tentacle with provider credentials
+    4. Tentacle's NotifierAgent uses DiscordProvider
     5. DiscordProvider sends to mock Discord server
     """
     
@@ -54,13 +54,13 @@ async def test_full_flow_mimic_to_discord(client, test_user_annual, db_session):
     except Exception:
         pass  # Mock server might not be accessible from test
     
-    # 4. Mock Tentackl client to simulate Tentackl calling DiscordProvider
-    # In real flow, Tentackl would receive the request and execute NotifierAgent
-    # For this test, we'll mock the Tentackl response but verify the flow
+    # 4. Mock Tentacle client to simulate Tentacle calling DiscordProvider
+    # In real flow, Tentacle would receive the request and execute NotifierAgent
+    # For this test, we'll mock the Tentacle response but verify the flow
     
-    with patch('src.clients.tentackl_client.TentacklClient.send_notification') as mock_tentackl:
-        # Mock Tentackl returning a workflow ID
-        mock_tentackl.return_value = "workflow-run-123"
+    with patch('src.clients.tentacle_client.TentacleClient.send_notification') as mock_tentacle:
+        # Mock Tentacle returning a workflow ID
+        mock_tentacle.return_value = "workflow-run-123"
         
         # 5. Send notification via Mimic API
         print("\n📤 Step 1: Sending notification to Mimic API...")
@@ -68,7 +68,7 @@ async def test_full_flow_mimic_to_discord(client, test_user_annual, db_session):
             "/api/v1/send",
             json={
                 "recipient": "#general",
-                "content": "🎉 Full flow test: Mimic → Tentackl → Discord!",
+                "content": "🎉 Full flow test: Mimic → Tentacle → Discord!",
                 "provider": "discord"
             },
             headers={"Authorization": f"Bearer {api_key_value}"}
@@ -81,11 +81,11 @@ async def test_full_flow_mimic_to_discord(client, test_user_annual, db_session):
         
         print(f"✅ Mimic API accepted request, delivery_id: {delivery_id}")
         
-        # 6. Verify Tentackl was called with correct parameters
-        assert mock_tentackl.called, "Tentackl client should have been called"
-        call_args = mock_tentackl.call_args
+        # 6. Verify Tentacle was called with correct parameters
+        assert mock_tentacle.called, "Tentacle client should have been called"
+        call_args = mock_tentacle.call_args
         
-        print(f"\n📋 Step 2: Verifying Tentackl call parameters...")
+        print(f"\n📋 Step 2: Verifying Tentacle call parameters...")
         print(f"   User ID: {call_args.kwargs.get('user_id')}")
         print(f"   Provider: {call_args.kwargs.get('provider')}")
         print(f"   Recipient: {call_args.kwargs.get('recipient')}")
@@ -94,13 +94,13 @@ async def test_full_flow_mimic_to_discord(client, test_user_annual, db_session):
         # In the real implementation, provider_credentials would be passed
         # but our mock doesn't capture that. Let's verify the call was made correctly.
         
-    # 7. Now test the actual Tentackl → Discord flow
-    # This simulates what happens inside Tentackl when it receives the request
-    print(f"\n📋 Step 3: Testing Tentackl → Discord flow...")
+    # 7. Now test the actual Tentacle → Discord flow
+    # This simulates what happens inside Tentacle when it receives the request
+    print(f"\n📋 Step 3: Testing Tentacle → Discord flow...")
     
-    # Import DiscordProvider from Tentackl
+    # Import DiscordProvider from Tentacle
     import sys
-    sys.path.insert(0, '/app/../src')  # Adjust path for Tentackl src
+    sys.path.insert(0, '/app/../src')  # Adjust path for Tentacle src
     from agents.providers.discord_provider import DiscordProvider
     
     # Use the same webhook URL that Mimic would pass
@@ -108,7 +108,7 @@ async def test_full_flow_mimic_to_discord(client, test_user_annual, db_session):
     
     result = await provider.send(
         recipient="#general",
-        content="🎉 Full flow test: Mimic → Tentackl → Discord!"
+        content="🎉 Full flow test: Mimic → Tentacle → Discord!"
     )
     
     assert result.success is True, f"Discord provider failed: {result.error}"
@@ -141,8 +141,8 @@ async def test_full_flow_mimic_to_discord(client, test_user_annual, db_session):
 
 @pytest.mark.integration
 @pytest.mark.skip(reason="Requires running InkPass service for full authentication flow")
-def test_mimic_api_to_tentackl_integration(client, test_user_annual, db_session):
-    """Test that Mimic API correctly calls Tentackl with provider credentials"""
+def test_mimic_api_to_tentacle_integration(client, test_user_annual, db_session):
+    """Test that Mimic API correctly calls Tentacle with provider credentials"""
     
     # Setup user, API key, and provider key
     api_key_value = "test-integration-key"
@@ -166,8 +166,8 @@ def test_mimic_api_to_tentackl_integration(client, test_user_annual, db_session)
     db_session.add(provider_key)
     db_session.commit()
     
-    # Mock Tentackl client to capture what Mimic sends
-    with patch('src.clients.tentackl_client.TentacklClient.send_notification') as mock_send:
+    # Mock Tentacle client to capture what Mimic sends
+    with patch('src.clients.tentacle_client.TentacleClient.send_notification') as mock_send:
         mock_send.return_value = "workflow-123"
         
         # Call Mimic API
@@ -183,7 +183,7 @@ def test_mimic_api_to_tentackl_integration(client, test_user_annual, db_session)
         
         assert response.status_code == 200
         
-        # Verify Tentackl was called
+        # Verify Tentacle was called
         assert mock_send.called
         
         # Verify call parameters
@@ -194,5 +194,5 @@ def test_mimic_api_to_tentackl_integration(client, test_user_annual, db_session)
         assert call_kwargs['content'] == "Integration test"
         
         # In real implementation, provider_credentials would be in the call
-        # The TentacklClient retrieves and decrypts them before calling Tentackl
+        # The TentacleClient retrieves and decrypts them before calling Tentacle
 

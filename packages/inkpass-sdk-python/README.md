@@ -308,7 +308,7 @@ config = InkPassConfig(
 
 ## File Management (Den)
 
-The SDK includes a `FileClient` for managing files in InkPass Den storage. This is primarily used for service-to-service communication (e.g., Tentackl agents uploading/downloading files).
+The SDK includes a `FileClient` for managing files in InkPass Den storage. This is primarily used for service-to-service communication (e.g., Tentacle agents uploading/downloading files).
 
 ### FileClient Usage
 
@@ -319,7 +319,7 @@ from uuid import UUID
 # Initialize client with service API key
 file_client = FileClient(
     base_url="http://inkpass:8002",
-    service_api_key="sk_tentackl_xxx"
+    service_api_key="sk_tentacle_xxx"
 )
 
 # Upload a file

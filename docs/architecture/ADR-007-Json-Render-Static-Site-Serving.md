@@ -41,7 +41,7 @@ Reasons:
 2. Unnecessary for static sites.
 3. Slower cold-start and weaker cache characteristics.
 
-### Option B: Serve directly from Tentackl API
+### Option B: Serve directly from Tentacle API
 Rejected.
 Reasons:
 1. Mixes orchestration API concerns with public web serving.

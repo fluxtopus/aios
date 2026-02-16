@@ -61,7 +61,7 @@ class InboundAuthMethod(str, Enum):
 class DestinationService(str, Enum):
     """Destination services for inbound webhooks."""
 
-    tentackl = "tentackl"
+    tentacle = "tentacle"
     custom = "custom"
 
 
@@ -234,7 +234,7 @@ class InboundConfigCreate(BaseModel):
         None, description="Jinja2 template for payload transformation"
     )
     destination_service: DestinationService = Field(
-        default=DestinationService.tentackl, description="Service to route events to"
+        default=DestinationService.tentacle, description="Service to route events to"
     )
     destination_config: dict[str, Any] | None = Field(
         None, description="Destination config: task_template_id, workflow_id, webhook_url"

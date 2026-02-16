@@ -14,7 +14,7 @@ class TestServiceAccountValidation:
     def test_valid_service_key(self, client, db):
         """Test valid service API key is accepted."""
         # Set up test key via environment variable
-        with patch.dict(os.environ, {"SERVICE_API_KEYS": "tentackl:valid-test-key"}):
+        with patch.dict(os.environ, {"SERVICE_API_KEYS": "tentacle:valid-test-key"}):
             # Need to reload settings for env var to take effect
             from src.config import Settings
             test_settings = Settings()

@@ -57,7 +57,7 @@ class InboundAuthMethod(str, enum.Enum):
 
 class DestinationService(str, enum.Enum):
     """Target service for inbound webhook routing."""
-    tentackl = "tentackl"
+    tentacle = "tentacle"
     custom = "custom"
 
 
@@ -272,7 +272,7 @@ class WebhookDelivery(Base):
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     event_id = Column(String, ForeignKey("webhook_events.id"), nullable=False, index=True)
-    target_service = Column(String(50), nullable=False)  # inkpass, tentackl, custom, etc.
+    target_service = Column(String(50), nullable=False)  # inkpass, tentacle, custom, etc.
     task_name = Column(String(255), nullable=False)  # Celery task name
     status = Column(String(20), default="pending")  # pending, success, failed
     celery_task_id = Column(String(255), nullable=True)  # Celery task ID for tracking
@@ -375,7 +375,7 @@ class IntegrationInboundConfig(Base):
     destination_service = Column(
         Enum(DestinationService, name="destination_service_enum", create_type=False),
         nullable=False,
-        default=DestinationService.tentackl
+        default=DestinationService.tentacle
     )
     destination_config = Column(JSON, nullable=True)  # URL, headers, etc.
     is_active = Column(Boolean, default=True)

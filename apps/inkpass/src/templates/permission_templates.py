@@ -58,8 +58,8 @@ INKPASS_CORE_PERMISSIONS: Set[Permission] = {
     ("plans", "manage"),
 }
 
-# Tentackl service permissions
-TENTACKL_PERMISSIONS: Set[Permission] = {
+# Tentacle service permissions
+TENTACLE_PERMISSIONS: Set[Permission] = {
     ("workflows", "view"),
     ("workflows", "create"),
     ("workflows", "update"),
@@ -261,29 +261,29 @@ INKPASS_SOLO_TEMPLATE = TemplateDefinition(
 
 
 # =============================================================================
-# TENTACKL SOLO TEMPLATE
+# TENTACLE SOLO TEMPLATE
 # =============================================================================
 
-_TENTACKL_ALL = TENTACKL_PERMISSIONS | INKPASS_CORE_PERMISSIONS
+_TENTACLE_ALL = TENTACLE_PERMISSIONS | INKPASS_CORE_PERMISSIONS
 
-TENTACKL_SOLO_TEMPLATE = TemplateDefinition(
-    name="TENTACKL_SOLO",
-    product_type=ProductType.TENTACKL_SOLO,
+TENTACLE_SOLO_TEMPLATE = TemplateDefinition(
+    name="TENTACLE_SOLO",
+    product_type=ProductType.TENTACLE_SOLO,
     version=3,  # Bumped for capabilities permissions
-    description="Tentackl standalone product for workflow orchestration",
+    description="Tentacle standalone product for workflow orchestration",
     roles=[
         RoleDefinition(
             name="owner",
             display_name="Owner",
-            description="Full access to all Tentackl features including billing",
-            permissions=_TENTACKL_ALL,
+            description="Full access to all Tentacle features including billing",
+            permissions=_TENTACLE_ALL,
             priority=100,
         ),
         RoleDefinition(
             name="admin",
             display_name="Administrator",
             description="Full access except billing management",
-            permissions=_get_admin_permissions(_TENTACKL_ALL),
+            permissions=_get_admin_permissions(_TENTACLE_ALL),
             priority=80,
             inherits_from="developer",
         ),
@@ -291,7 +291,7 @@ TENTACKL_SOLO_TEMPLATE = TemplateDefinition(
             name="developer",
             display_name="Developer",
             description="Can create and execute workflows, agents, and tasks",
-            permissions=_get_developer_permissions(_TENTACKL_ALL),
+            permissions=_get_developer_permissions(_TENTACLE_ALL),
             priority=50,
             inherits_from="viewer",
         ),
@@ -299,7 +299,7 @@ TENTACKL_SOLO_TEMPLATE = TemplateDefinition(
             name="viewer",
             display_name="Viewer",
             description="Read-only access to workflows and resources",
-            permissions=_get_view_permissions(_TENTACKL_ALL),
+            permissions=_get_view_permissions(_TENTACLE_ALL),
             priority=10,
         ),
     ],
@@ -357,7 +357,7 @@ MIMIC_SOLO_TEMPLATE = TemplateDefinition(
 # =============================================================================
 
 _AIOS_ALL = (
-    TENTACKL_PERMISSIONS |
+    TENTACLE_PERMISSIONS |
     MIMIC_PERMISSIONS |
     AIOS_PERMISSIONS |
     INKPASS_CORE_PERMISSIONS
@@ -409,7 +409,7 @@ AIOS_BUNDLE_TEMPLATE = TemplateDefinition(
 
 TEMPLATE_REGISTRY: dict[ProductType, TemplateDefinition] = {
     ProductType.INKPASS_SOLO: INKPASS_SOLO_TEMPLATE,
-    ProductType.TENTACKL_SOLO: TENTACKL_SOLO_TEMPLATE,
+    ProductType.TENTACLE_SOLO: TENTACLE_SOLO_TEMPLATE,
     ProductType.MIMIC_SOLO: MIMIC_SOLO_TEMPLATE,
     ProductType.AIOS_BUNDLE: AIOS_BUNDLE_TEMPLATE,
 }
@@ -433,7 +433,7 @@ def get_template_by_name(name: str) -> Optional[TemplateDefinition]:
     Get a template by name.
 
     Args:
-        name: Template name (e.g., "TENTACKL_SOLO")
+        name: Template name (e.g., "TENTACLE_SOLO")
 
     Returns:
         TemplateDefinition if found, None otherwise

@@ -300,7 +300,7 @@ Log output example:
 
 ## Contributing
 
-Follow Tentackl architecture patterns:
+Follow Tentacle architecture patterns:
 - Use async/await for all I/O
 - Add type hints to all functions
 - Write comprehensive docstrings

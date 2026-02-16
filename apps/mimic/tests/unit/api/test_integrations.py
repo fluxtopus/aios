@@ -125,7 +125,7 @@ def test_integration_with_configs(db_session):
         integration_id=integration.id,
         webhook_path="discord-webhook-abc123",
         auth_method=InboundAuthMethod.signature,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         destination_config={"task_template_id": "template-123"},
         is_active=True,
     )
@@ -1578,7 +1578,7 @@ def test_inbound_config(db_session, test_integration):
         signature_secret="encrypted_secret_value",
         event_filters=["push", "pull_request"],
         transform_template="{{ payload | tojson }}",
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         destination_config={"task_template_id": "template-123"},
         is_active=True,
     )
@@ -1605,7 +1605,7 @@ def test_set_inbound_config_create_success(
             "auth_method": "signature",
             "signature_secret": "my-hmac-secret",
             "event_filters": ["push", "release"],
-            "destination_service": "tentackl",
+            "destination_service": "tentacle",
             "destination_config": {"task_template_id": "tmpl-123"},
         },
         headers={"Authorization": "Bearer mock-token"},
@@ -1617,7 +1617,7 @@ def test_set_inbound_config_create_success(
     assert data["auth_method"] == "signature"
     assert data["has_signature_secret"] is True
     assert data["event_filters"] == ["push", "release"]
-    assert data["destination_service"] == "tentackl"
+    assert data["destination_service"] == "tentacle"
     assert data["destination_config"] == {"task_template_id": "tmpl-123"}
     assert data["is_active"] is True
     assert "webhook_url" in data
@@ -1633,7 +1633,7 @@ def test_set_inbound_config_auto_generate_path(
         f"/api/v1/integrations/{test_integration.id}/inbound",
         json={
             "auth_method": "none",
-            "destination_service": "tentackl",
+            "destination_service": "tentacle",
         },
         headers={"Authorization": "Bearer mock-token"},
     )
@@ -1655,7 +1655,7 @@ def test_set_inbound_config_update_existing(
             "webhook_path": "wh-updated-path",
             "auth_method": "api_key",
             "event_filters": ["updated_event"],
-            "destination_service": "tentackl",
+            "destination_service": "tentacle",
             "destination_config": {"task_template_id": "tmpl-123"},
             "is_active": False,
         },
@@ -1667,7 +1667,7 @@ def test_set_inbound_config_update_existing(
     assert data["webhook_path"] == "wh-updated-path"
     assert data["auth_method"] == "api_key"
     assert data["event_filters"] == ["updated_event"]
-    assert data["destination_service"] == "tentackl"
+    assert data["destination_service"] == "tentacle"
     assert data["is_active"] is False
 
 
@@ -1685,7 +1685,7 @@ def test_set_inbound_config_minimal(
     assert response.status_code == 200
     data = response.json()
     assert data["auth_method"] == "none"  # Default
-    assert data["destination_service"] == "tentackl"  # Default
+    assert data["destination_service"] == "tentacle"  # Default
     assert data["is_active"] is True  # Default
     assert data["webhook_path"].startswith("wh-")
 
@@ -1724,7 +1724,7 @@ def test_set_inbound_config_all_destinations(
     client, mock_inkpass_permission_check, db_session
 ):
     """Test creating inbound config with all destination services."""
-    destinations = ["tentackl", "custom"]
+    destinations = ["tentacle", "custom"]
 
     for i, dest in enumerate(destinations):
         integration = Integration(
@@ -1886,7 +1886,7 @@ def test_set_inbound_config_with_transform_template(
         f"/api/v1/integrations/{test_integration.id}/inbound",
         json={
             "transform_template": template,
-            "destination_service": "tentackl",
+            "destination_service": "tentacle",
         },
         headers={"Authorization": "Bearer mock-token"},
     )
@@ -1917,7 +1917,7 @@ def test_get_inbound_config_success(
     assert data["webhook_path"] == test_inbound_config.webhook_path
     assert data["auth_method"] == "signature"
     assert data["event_filters"] == ["push", "pull_request"]
-    assert data["destination_service"] == "tentackl"
+    assert data["destination_service"] == "tentacle"
     assert "webhook_url" in data
     assert test_inbound_config.webhook_path in data["webhook_url"]
 
@@ -2623,7 +2623,7 @@ def test_integration_with_inbound_none_auth(db_session):
         integration_id=integration.id,
         webhook_path="webhook-test-none",
         auth_method=InboundAuthMethod.none,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -2664,7 +2664,7 @@ def test_integration_with_inbound_api_key_auth(db_session):
         integration_id=integration.id,
         webhook_path="webhook-test-apikey",
         auth_method=InboundAuthMethod.api_key,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -2697,7 +2697,7 @@ def test_integration_with_inbound_signature_auth(db_session):
         webhook_path="webhook-test-signature",
         auth_method=InboundAuthMethod.signature,
         signature_secret=encryption_service.encrypt("my-webhook-secret"),
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -2738,7 +2738,7 @@ def test_integration_with_inbound_bearer_auth(db_session):
         integration_id=integration.id,
         webhook_path="webhook-test-bearer",
         auth_method=InboundAuthMethod.bearer,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -2767,7 +2767,7 @@ def test_integration_inactive(db_session):
         integration_id=integration.id,
         webhook_path="webhook-test-inactive",
         auth_method=InboundAuthMethod.none,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -2797,7 +2797,7 @@ def test_integration_deleted(db_session):
         integration_id=integration.id,
         webhook_path="webhook-test-deleted",
         auth_method=InboundAuthMethod.none,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -2826,7 +2826,7 @@ def test_integration_inbound_inactive(db_session):
         integration_id=integration.id,
         webhook_path="webhook-test-inbound-off",
         auth_method=InboundAuthMethod.none,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=False,
     )
     db_session.add(inbound_config)
@@ -3178,7 +3178,7 @@ def test_integration_with_transform_template(db_session):
         webhook_path="webhook-with-transform",
         auth_method=InboundAuthMethod.none,
         transform_template=transform_template,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -3211,7 +3211,7 @@ def test_integration_with_invalid_template(db_session):
         webhook_path="webhook-invalid-template",
         auth_method=InboundAuthMethod.none,
         transform_template=transform_template,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -3244,7 +3244,7 @@ def test_integration_with_undefined_var_template(db_session):
         webhook_path="webhook-undefined-var",
         auth_method=InboundAuthMethod.none,
         transform_template=transform_template,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -3277,7 +3277,7 @@ def test_integration_with_non_json_output_template(db_session):
         webhook_path="webhook-non-json-output",
         auth_method=InboundAuthMethod.none,
         transform_template=transform_template,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         is_active=True,
     )
     db_session.add(inbound_config)
@@ -3483,16 +3483,16 @@ def test_gateway_webhook_non_json_body_wrapped(client, test_integration_with_inb
 
 
 @pytest.fixture
-def test_integration_with_tentackl_routing(db_session):
-    """Create a test integration with Tentackl routing configured."""
+def test_integration_with_tentacle_routing(db_session):
+    """Create a test integration with Tentacle routing configured."""
     from src.services.key_encryption import KeyEncryptionService
     encryption_service = KeyEncryptionService()
 
     integration = Integration(
-        id="test-integration-tentackl",
+        id="test-integration-tentacle",
         organization_id="test-org-456",
         user_id="test-user-123",
-        name="Test Tentackl Routing",
+        name="Test Tentacle Routing",
         provider=IntegrationProvider.custom_webhook,
         direction=IntegrationDirection.inbound,
         status=IntegrationStatus.active,
@@ -3501,11 +3501,11 @@ def test_integration_with_tentackl_routing(db_session):
     db_session.commit()
 
     inbound_config = IntegrationInboundConfig(
-        id="inbound-config-tentackl",
+        id="inbound-config-tentacle",
         integration_id=integration.id,
-        webhook_path="webhook-tentackl-routing",
+        webhook_path="webhook-tentacle-routing",
         auth_method=InboundAuthMethod.none,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         destination_config={
             "task_template_id": "template-001",
             "agent_id": "agent-001",
@@ -3552,7 +3552,7 @@ def test_integration_with_custom_routing(db_session):
 
 
 @pytest.mark.unit
-def test_gateway_webhook_creates_event_record(client, db_session, test_integration_with_tentackl_routing):
+def test_gateway_webhook_creates_event_record(client, db_session, test_integration_with_tentacle_routing):
     """Test that receiving a webhook creates an IntegrationWebhookEvent record."""
     from src.database.models import IntegrationWebhookEvent
     from unittest.mock import MagicMock
@@ -3564,7 +3564,7 @@ def test_gateway_webhook_creates_event_record(client, db_session, test_integrati
         mock_task.delay.return_value = MagicMock(id="celery-task-123")
 
         response = client.post(
-            "/api/v1/gateway/integrations/webhook-tentackl-routing",
+            "/api/v1/gateway/integrations/webhook-tentacle-routing",
             json={"action": "test", "data": {"key": "value"}},
         )
 
@@ -3572,19 +3572,19 @@ def test_gateway_webhook_creates_event_record(client, db_session, test_integrati
 
     # Verify event was created
     event = db_session.query(IntegrationWebhookEvent).filter(
-        IntegrationWebhookEvent.integration_id == "test-integration-tentackl"
+        IntegrationWebhookEvent.integration_id == "test-integration-tentacle"
     ).first()
 
     assert event is not None
-    assert event.webhook_path == "webhook-tentackl-routing"
+    assert event.webhook_path == "webhook-tentacle-routing"
     assert event.provider == "custom_webhook"
-    assert event.destination_service == "tentackl"
+    assert event.destination_service == "tentacle"
     assert event.raw_payload == {"action": "test", "data": {"key": "value"}}
     assert event.transformed_payload is not None
 
 
 @pytest.mark.unit
-def test_gateway_webhook_creates_delivery_record(client, db_session, test_integration_with_tentackl_routing):
+def test_gateway_webhook_creates_delivery_record(client, db_session, test_integration_with_tentacle_routing):
     """Test that receiving a webhook creates an IntegrationWebhookDelivery record."""
     from src.database.models import IntegrationWebhookEvent, IntegrationWebhookDelivery
     from unittest.mock import MagicMock
@@ -3595,7 +3595,7 @@ def test_gateway_webhook_creates_delivery_record(client, db_session, test_integr
         mock_task.delay.return_value = MagicMock(id="celery-task-456")
 
         response = client.post(
-            "/api/v1/gateway/integrations/webhook-tentackl-routing",
+            "/api/v1/gateway/integrations/webhook-tentacle-routing",
             json={"test": "data"},
         )
 
@@ -3603,7 +3603,7 @@ def test_gateway_webhook_creates_delivery_record(client, db_session, test_integr
 
     # Verify delivery was created
     event = db_session.query(IntegrationWebhookEvent).filter(
-        IntegrationWebhookEvent.integration_id == "test-integration-tentackl"
+        IntegrationWebhookEvent.integration_id == "test-integration-tentacle"
     ).first()
 
     delivery = db_session.query(IntegrationWebhookDelivery).filter(
@@ -3611,13 +3611,13 @@ def test_gateway_webhook_creates_delivery_record(client, db_session, test_integr
     ).first()
 
     assert delivery is not None
-    assert delivery.destination_service == "tentackl"
+    assert delivery.destination_service == "tentacle"
     assert delivery.status == "pending"
     assert delivery.celery_task_id == "celery-task-456"
 
 
 @pytest.mark.unit
-def test_gateway_webhook_triggers_celery_task(client, test_integration_with_tentackl_routing):
+def test_gateway_webhook_triggers_celery_task(client, test_integration_with_tentacle_routing):
     """Test that receiving a webhook triggers the Celery routing task."""
     from unittest.mock import MagicMock
 
@@ -3627,7 +3627,7 @@ def test_gateway_webhook_triggers_celery_task(client, test_integration_with_tent
         mock_task.delay.return_value = MagicMock(id="celery-task-789")
 
         response = client.post(
-            "/api/v1/gateway/integrations/webhook-tentackl-routing",
+            "/api/v1/gateway/integrations/webhook-tentacle-routing",
             json={"action": "trigger_test"},
         )
 
@@ -3637,7 +3637,7 @@ def test_gateway_webhook_triggers_celery_task(client, test_integration_with_tent
     mock_task.delay.assert_called_once()
     call_kwargs = mock_task.delay.call_args[1]
 
-    assert call_kwargs["destination_service"] == "tentackl"
+    assert call_kwargs["destination_service"] == "tentacle"
     assert call_kwargs["destination_config"] == {
         "task_template_id": "template-001",
         "agent_id": "agent-001",
@@ -3671,7 +3671,7 @@ def test_gateway_webhook_custom_routing_destination(client, test_integration_wit
 
 
 @pytest.mark.unit
-def test_gateway_webhook_event_status_is_received(client, db_session, test_integration_with_tentackl_routing):
+def test_gateway_webhook_event_status_is_received(client, db_session, test_integration_with_tentacle_routing):
     """Test that new webhook events have 'received' status."""
     from src.database.models import IntegrationWebhookEvent, IntegrationWebhookEventStatus
     from unittest.mock import MagicMock
@@ -3682,21 +3682,21 @@ def test_gateway_webhook_event_status_is_received(client, db_session, test_integ
         mock_task.delay.return_value = MagicMock(id="celery-task-status")
 
         response = client.post(
-            "/api/v1/gateway/integrations/webhook-tentackl-routing",
+            "/api/v1/gateway/integrations/webhook-tentacle-routing",
             json={"test": "status"},
         )
 
     assert response.status_code == 200
 
     event = db_session.query(IntegrationWebhookEvent).filter(
-        IntegrationWebhookEvent.integration_id == "test-integration-tentackl"
+        IntegrationWebhookEvent.integration_id == "test-integration-tentacle"
     ).first()
 
     assert event.status == IntegrationWebhookEventStatus.received
 
 
 @pytest.mark.unit
-def test_gateway_webhook_transformed_payload_stored(client, db_session, test_integration_with_tentackl_routing):
+def test_gateway_webhook_transformed_payload_stored(client, db_session, test_integration_with_tentacle_routing):
     """Test that transformed payload is stored in the event record."""
     from src.database.models import IntegrationWebhookEvent
     from unittest.mock import MagicMock
@@ -3707,14 +3707,14 @@ def test_gateway_webhook_transformed_payload_stored(client, db_session, test_int
         mock_task.delay.return_value = MagicMock(id="celery-task-transformed")
 
         response = client.post(
-            "/api/v1/gateway/integrations/webhook-tentackl-routing",
+            "/api/v1/gateway/integrations/webhook-tentacle-routing",
             json={"action": "transform_test", "value": 123},
         )
 
     assert response.status_code == 200
 
     event = db_session.query(IntegrationWebhookEvent).filter(
-        IntegrationWebhookEvent.integration_id == "test-integration-tentackl"
+        IntegrationWebhookEvent.integration_id == "test-integration-tentacle"
     ).first()
 
     # Transformed payload should have standard format
@@ -3728,7 +3728,7 @@ def test_gateway_webhook_transformed_payload_stored(client, db_session, test_int
 
 
 @pytest.mark.unit
-def test_gateway_webhook_response_message_indicates_routing(client, test_integration_with_tentackl_routing):
+def test_gateway_webhook_response_message_indicates_routing(client, test_integration_with_tentacle_routing):
     """Test that response message indicates routing was triggered."""
     from unittest.mock import MagicMock
 
@@ -3738,7 +3738,7 @@ def test_gateway_webhook_response_message_indicates_routing(client, test_integra
         mock_task.delay.return_value = MagicMock(id="celery-task-msg")
 
         response = client.post(
-            "/api/v1/gateway/integrations/webhook-tentackl-routing",
+            "/api/v1/gateway/integrations/webhook-tentacle-routing",
             json={"test": "message"},
         )
 
@@ -3749,7 +3749,7 @@ def test_gateway_webhook_response_message_indicates_routing(client, test_integra
 
 
 @pytest.mark.unit
-def test_gateway_webhook_organization_id_stored_in_event(client, db_session, test_integration_with_tentackl_routing):
+def test_gateway_webhook_organization_id_stored_in_event(client, db_session, test_integration_with_tentacle_routing):
     """Test that organization_id is stored in the event for querying."""
     from src.database.models import IntegrationWebhookEvent
     from unittest.mock import MagicMock
@@ -3760,7 +3760,7 @@ def test_gateway_webhook_organization_id_stored_in_event(client, db_session, tes
         mock_task.delay.return_value = MagicMock(id="celery-task-org")
 
         response = client.post(
-            "/api/v1/gateway/integrations/webhook-tentackl-routing",
+            "/api/v1/gateway/integrations/webhook-tentacle-routing",
             json={"test": "org"},
         )
 
@@ -3798,7 +3798,7 @@ def test_gateway_webhook_null_destination_config_handled(client, db_session):
         integration_id=integration.id,
         webhook_path="webhook-null-config",
         auth_method=InboundAuthMethod.none,
-        destination_service=DestinationService.tentackl,
+        destination_service=DestinationService.tentacle,
         destination_config=None,  # Null config
         is_active=True,
     )

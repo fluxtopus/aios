@@ -50,7 +50,7 @@ async def check_permission(
     """
     Check if the current user has a specific permission.
 
-    Used by downstream services (Mimic, Tentackl) to validate permissions.
+    Used by downstream services (Mimic, Tentacle) to validate permissions.
     Returns {allowed: true/false, resource, action}.
     """
     if not auth_context.user:

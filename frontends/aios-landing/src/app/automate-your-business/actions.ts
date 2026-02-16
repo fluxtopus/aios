@@ -20,7 +20,7 @@ interface PlanResult {
 }
 
 function getServiceHeaders(): Record<string, string> {
-  const token = process.env.TENTACKL_SERVICE_TOKEN
+  const token = process.env.TENTACLE_SERVICE_TOKEN
   if (!token) {
     throw new Error('Server configuration error: missing service token')
   }
@@ -31,7 +31,7 @@ function getServiceHeaders(): Record<string, string> {
 }
 
 export async function generatePlan(businessDescription: string): Promise<PlanResult> {
-  const API = process.env.TENTACKL_API_URL
+  const API = process.env.TENTACLE_API_URL
 
   if (!API) {
     throw new Error('Server configuration error')
@@ -60,7 +60,7 @@ export async function joinWaitlist(
   businessDescription: string,
   taskId: string,
 ) {
-  const API = process.env.TENTACKL_API_URL
+  const API = process.env.TENTACLE_API_URL
 
   if (!API) {
     throw new Error('Server configuration error')

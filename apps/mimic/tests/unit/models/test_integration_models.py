@@ -268,7 +268,7 @@ class TestIntegrationInboundConfigModel:
             webhook_path="gh-webhooks-abc123",
             auth_method=InboundAuthMethod.signature,
             event_filters=["push", "pull_request"],
-            destination_service=DestinationService.tentackl,
+            destination_service=DestinationService.tentacle,
             destination_config={"task_template_id": "tmpl-123"},
         )
         db_session.add(inbound_config)
@@ -279,7 +279,7 @@ class TestIntegrationInboundConfigModel:
         assert inbound_config.webhook_path == "gh-webhooks-abc123"
         assert inbound_config.auth_method == InboundAuthMethod.signature
         assert inbound_config.event_filters == ["push", "pull_request"]
-        assert inbound_config.destination_service == DestinationService.tentackl
+        assert inbound_config.destination_service == DestinationService.tentacle
 
     def test_inbound_config_with_transform_template(self, db_session):
         """Test inbound config with Jinja2 transform template"""
@@ -307,7 +307,7 @@ class TestIntegrationInboundConfigModel:
             webhook_path="stripe-wh-xyz",
             auth_method=InboundAuthMethod.signature,
             transform_template=transform_template,
-            destination_service=DestinationService.tentackl,
+            destination_service=DestinationService.tentacle,
         )
         db_session.add(inbound_config)
         db_session.commit()
@@ -336,7 +336,7 @@ class TestIntegrationInboundConfigModel:
             integration_id=integration1.id,
             webhook_path="unique-path",
             auth_method=InboundAuthMethod.none,
-            destination_service=DestinationService.tentackl,
+            destination_service=DestinationService.tentacle,
         )
         db_session.add(inbound1)
         db_session.commit()
@@ -346,7 +346,7 @@ class TestIntegrationInboundConfigModel:
             integration_id=integration2.id,
             webhook_path="unique-path",
             auth_method=InboundAuthMethod.none,
-            destination_service=DestinationService.tentackl,
+            destination_service=DestinationService.tentacle,
         )
         db_session.add(inbound2)
 
@@ -372,7 +372,7 @@ class TestIntegrationOutboundConfigModel:
         outbound_config = IntegrationOutboundConfig(
             integration_id=integration.id,
             action_type=OutboundActionType.send_message,
-            default_template={"content": "Hello from Tentackl!"},
+            default_template={"content": "Hello from Tentacle!"},
             rate_limit_requests=10,
             rate_limit_window_seconds=60,
         )
@@ -382,7 +382,7 @@ class TestIntegrationOutboundConfigModel:
 
         assert outbound_config.id is not None
         assert outbound_config.action_type == OutboundActionType.send_message
-        assert outbound_config.default_template == {"content": "Hello from Tentackl!"}
+        assert outbound_config.default_template == {"content": "Hello from Tentacle!"}
         assert outbound_config.rate_limit_requests == 10
         assert outbound_config.rate_limit_window_seconds == 60
 
@@ -473,7 +473,7 @@ class TestIntegrationRelationships:
             integration_id=integration.id,
             webhook_path="discord-in-123",
             auth_method=InboundAuthMethod.signature,
-            destination_service=DestinationService.tentackl,
+            destination_service=DestinationService.tentacle,
         )
 
         # Add outbound config
@@ -515,7 +515,7 @@ class TestIntegrationRelationships:
             integration_id=integration.id,
             webhook_path="slack-cascade-test",
             auth_method=InboundAuthMethod.signature,
-            destination_service=DestinationService.tentackl,
+            destination_service=DestinationService.tentacle,
         )
         outbound = IntegrationOutboundConfig(
             integration_id=integration.id,

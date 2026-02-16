@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     # Integration
     MIMIC_URL: str = "http://mimic:8001"
     MIMIC_API_KEY: str = ""  # Service API key for Mimic notifications
-    TENTACKL_URL: str = "http://tentackl:8000"
+    TENTACLE_URL: str = "http://tentacle:8000"
     FRONTEND_URL: str = "http://localhost:3000"  # Frontend URL for invitation links
 
     # OAuth Configuration

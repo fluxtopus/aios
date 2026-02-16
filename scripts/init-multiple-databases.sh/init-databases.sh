@@ -23,9 +23,9 @@ if [ -n "${POSTGRES_MULTIPLE_DATABASES:-}" ]; then
 else
     # Default databases for local development
     create_database aios_inkpass
-    create_database aios_tentackl
+    create_database aios_tentacle
     create_database aios_mimic
-    echo "Default databases created: aios_inkpass, aios_tentackl, aios_mimic"
+    echo "Default databases created: aios_inkpass, aios_tentacle, aios_mimic"
 fi
 
 # Enable extensions for semantic search (pgvector) and text search (pg_trgm)

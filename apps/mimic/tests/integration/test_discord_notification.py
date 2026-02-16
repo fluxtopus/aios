@@ -69,8 +69,8 @@ async def test_discord_notification_delivery(client, test_user_annual, db_sessio
     db_session.add(provider_key)
     db_session.commit()
     
-    # 3. Mock Tentackl client to return workflow ID
-    with patch('src.clients.tentackl_client.TentacklClient.send_notification') as mock_send:
+    # 3. Mock Tentacle client to return workflow ID
+    with patch('src.clients.tentacle_client.TentacleClient.send_notification') as mock_send:
         mock_send.return_value = "workflow-run-123"
         
         # 4. Send notification via API

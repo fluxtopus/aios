@@ -18,7 +18,7 @@ class TestSendFollowup:
         """Verify URL construction, payload, and successful response."""
         app_id = "123456789"
         token = "interaction-token-abc"
-        content = "Hello from Tentackl!"
+        content = "Hello from Tentacle!"
         expected_url = f"{DISCORD_API_BASE}/webhooks/{app_id}/{token}"
         mock_response_data = {"id": "msg-1", "content": content}
 

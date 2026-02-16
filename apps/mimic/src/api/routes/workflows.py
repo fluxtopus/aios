@@ -8,14 +8,14 @@ from src.database.database import get_db
 from src.database.models import Workflow, User
 from src.api.auth import require_permission, AuthContext
 from src.services.workflow_compiler import WorkflowCompiler
-from src.clients.tentackl_client import TentacklClient
+from src.clients.tentacle_client import TentacleClient
 from src.middleware.subscription_check import check_subscription
 from fastapi import HTTPException, status
 import uuid
 
 router = APIRouter()
 workflow_compiler = WorkflowCompiler()
-tentackl_client = TentacklClient()
+tentacle_client = TentacleClient()
 
 
 class WorkflowCreate(BaseModel):
@@ -239,14 +239,14 @@ async def trigger_workflow(
             detail="Workflow is not active"
         )
     
-    # Compile workflow to Tentackl spec
-    tentackl_spec = workflow_compiler.compile(workflow.definition_json)
+    # Compile workflow to Tentacle spec
+    tentacle_spec = workflow_compiler.compile(workflow.definition_json)
     
-    # Trigger workflow in Tentackl
+    # Trigger workflow in Tentacle
     try:
-        run_id = await tentackl_client.trigger_workflow(
+        run_id = await tentacle_client.trigger_workflow(
             user_id=auth.user_id,
-            workflow_spec=tentackl_spec,
+            workflow_spec=tentacle_spec,
             parameters=trigger_data.parameters or {}
         )
         

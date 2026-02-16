@@ -8,15 +8,15 @@ Usage:
     from inkpass_sdk.dev_permissions import (
         ALL_PERMISSIONS,
         ROLE_PRESETS,
-        TENTACKL_PERMISSIONS,
+        TENTACLE_PERMISSIONS,
         get_permissions_for_preset,
     )
 
     # Get all permissions for admin preset
     admin_perms = get_permissions_for_preset("admin")
 
-    # Get only Tentackl permissions
-    tentackl_perms = TENTACKL_PERMISSIONS
+    # Get only Tentacle permissions
+    tentacle_perms = TENTACLE_PERMISSIONS
     ```
 """
 
@@ -27,10 +27,10 @@ Permission = Tuple[str, str]
 
 
 # =============================================================================
-# TENTACKL SERVICE PERMISSIONS
+# TENTACLE SERVICE PERMISSIONS
 # =============================================================================
 
-TENTACKL_RESOURCES = {
+TENTACLE_RESOURCES = {
     "workflows",
     "workflow_specs",
     "workflow_runs",
@@ -46,7 +46,7 @@ TENTACKL_RESOURCES = {
     "metrics",
 }
 
-TENTACKL_PERMISSIONS: Set[Permission] = {
+TENTACLE_PERMISSIONS: Set[Permission] = {
     # Workflows - Core workflow management
     ("workflows", "view"),
     ("workflows", "create"),
@@ -116,11 +116,11 @@ TENTACKL_PERMISSIONS: Set[Permission] = {
 MIMIC_RESOURCES = {
     "notifications",
     "templates",
-    "workflows",  # Mimic notification workflows (separate from Tentackl)
+    "workflows",  # Mimic notification workflows (separate from Tentacle)
     "provider_keys",
     "delivery_logs",
     "analytics",
-    "webhooks",  # Mimic webhook callbacks (separate from Tentackl)
+    "webhooks",  # Mimic webhook callbacks (separate from Tentacle)
     "gateway",
 }
 
@@ -271,12 +271,12 @@ INKPASS_PERMISSIONS: Set[Permission] = {
 # =============================================================================
 
 ALL_PERMISSIONS: Set[Permission] = (
-    TENTACKL_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS | INKPASS_PERMISSIONS
+    TENTACLE_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS | INKPASS_PERMISSIONS
 )
 
 # Service-specific combined sets (excluding InkPass core which all services need)
 SERVICE_PERMISSIONS = {
-    "tentackl": TENTACKL_PERMISSIONS | INKPASS_PERMISSIONS,
+    "tentacle": TENTACLE_PERMISSIONS | INKPASS_PERMISSIONS,
     "mimic": MIMIC_PERMISSIONS | INKPASS_PERMISSIONS,
     "aios": AIOS_PERMISSIONS | INKPASS_PERMISSIONS,
     "inkpass": INKPASS_PERMISSIONS,
@@ -296,7 +296,7 @@ ROLE_PRESETS: dict[str, Set[Permission]] = {
     # Full admin access to everything
     "admin": ALL_PERMISSIONS,
     # Service-specific admin roles
-    "tentackl_admin": TENTACKL_PERMISSIONS | INKPASS_PERMISSIONS,
+    "tentacle_admin": TENTACLE_PERMISSIONS | INKPASS_PERMISSIONS,
     "mimic_admin": MIMIC_PERMISSIONS | INKPASS_PERMISSIONS,
     "aios_admin": AIOS_PERMISSIONS | INKPASS_PERMISSIONS,
     # Developer - can view, create, execute but not delete or admin
@@ -364,7 +364,7 @@ def get_permissions_for_service(service: str) -> Set[Permission]:
     Get all permissions for a specific service.
 
     Args:
-        service: Service name ("tentackl", "mimic", "aios", "inkpass")
+        service: Service name ("tentacle", "mimic", "aios", "inkpass")
 
     Returns:
         Set of (resource, action) tuples
@@ -396,9 +396,9 @@ def get_new_permissions() -> Set[Permission]:
     Get permissions that need to be created (excluding InkPass core which already exists).
 
     Returns:
-        Set of (resource, action) tuples for Tentackl and Mimic
+        Set of (resource, action) tuples for Tentacle and Mimic
     """
-    return TENTACKL_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
+    return TENTACLE_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
 
 
 # =============================================================================
@@ -406,7 +406,7 @@ def get_new_permissions() -> Set[Permission]:
 # =============================================================================
 
 PERMISSION_COUNTS = {
-    "tentackl": len(TENTACKL_PERMISSIONS),
+    "tentacle": len(TENTACLE_PERMISSIONS),
     "mimic": len(MIMIC_PERMISSIONS),
     "aios": len(AIOS_PERMISSIONS),
     "inkpass": len(INKPASS_PERMISSIONS),

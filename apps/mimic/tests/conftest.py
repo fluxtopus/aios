@@ -195,12 +195,12 @@ def mock_inkpass_auth(db_session):
 
 
 @pytest.fixture
-def mock_tentackl_client():
-    """Mock Tentackl client"""
-    # Some routes import TentacklClient directly (e.g. notifications.py), so patch both the
+def mock_tentacle_client():
+    """Mock Tentacle client"""
+    # Some routes import TentacleClient directly (e.g. notifications.py), so patch both the
     # original module and the already-imported symbol.
-    with patch("src.clients.tentackl_client.TentacklClient") as mock_client_cls, patch(
-        "src.api.routes.notifications.TentacklClient"
+    with patch("src.clients.tentacle_client.TentacleClient") as mock_client_cls, patch(
+        "src.api.routes.notifications.TentacleClient"
     ) as mock_notifications_cls:
         for mock_cls in (mock_client_cls, mock_notifications_cls):
             instance = mock_cls.return_value

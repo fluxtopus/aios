@@ -23,7 +23,7 @@ class ProductType(str, Enum):
     """
 
     INKPASS_SOLO = "inkpass_solo"
-    TENTACKL_SOLO = "tentackl_solo"
+    TENTACLE_SOLO = "tentacle_solo"
     MIMIC_SOLO = "mimic_solo"
     AIOS_BUNDLE = "aios_bundle"
 
@@ -86,7 +86,7 @@ class TemplateDefinition:
     Each template contains a set of roles that users can be assigned.
 
     Attributes:
-        name: Unique template name (e.g., "TENTACKL_SOLO")
+        name: Unique template name (e.g., "TENTACLE_SOLO")
         product_type: The product type this template applies to
         version: Template version (increment when permissions change)
         roles: List of role definitions within this template
@@ -94,8 +94,8 @@ class TemplateDefinition:
 
     Example:
         TemplateDefinition(
-            name="TENTACKL_SOLO",
-            product_type=ProductType.TENTACKL_SOLO,
+            name="TENTACLE_SOLO",
+            product_type=ProductType.TENTACLE_SOLO,
             version=1,
             roles=[
                 RoleDefinition(name="owner", ...),
