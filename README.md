@@ -16,8 +16,8 @@ docker compose exec inkpass python scripts/seed_dev_users.py
 ```
 
 **Access services (Development):**
-- Tentackl API: http://localhost:8005
-- Tentackl UI: http://localhost:3000
+- Tentacle API: http://localhost:8005
+- Tentacle UI: http://localhost:3000
 - InkPass API: http://localhost:8004
 - Mimic API: http://localhost:8006
 - Mimic UI: http://localhost:3001
@@ -32,7 +32,7 @@ docker compose exec inkpass python scripts/seed_dev_users.py
 
 | Service | Description | Port | Tech Stack |
 |---------|-------------|------|------------|
-| **Tentackl** | Multi-agent workflow orchestration engine | 8005 | FastAPI, Celery, PostgreSQL, Redis |
+| **Tentacle** | Multi-agent workflow orchestration engine | 8005 | FastAPI, Celery, PostgreSQL, Redis |
 | **InkPass** | Authentication & authorization service | 8004 | FastAPI, PostgreSQL, Redis |
 | **Mimic** | Notification workflow management platform | 8006 | FastAPI, PostgreSQL |
 
@@ -41,11 +41,11 @@ docker compose exec inkpass python scripts/seed_dev_users.py
 ```text
 aios/
 ├── apps/                      # Independent deployable services
-│   ├── tentackl/              # Task orchestration
+│   ├── tentacle/              # Task orchestration
 │   ├── inkpass/               # Auth service
 │   └── mimic/                 # Notification service
 ├── frontends/                 # UI applications
-│   ├── tentackl-ui/           # Workflow visualization
+│   ├── tentacle-ui/           # Workflow visualization
 │   ├── mimic-ui/              # Notification UI
 │   └── aios-landing/          # Marketing site
 ├── packages/                  # Shared SDKs and utilities
@@ -88,7 +88,7 @@ docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 
 ## 📚 Documentation
 
-- Tentackl: `apps/tentackl/README.md`
+- Tentacle: `apps/tentacle/README.md`
 - InkPass: `apps/inkpass/README.md`
 - Mimic: `apps/mimic/README.md`
 - Package release skill: `skills/aios-agent-package-maintainer/SKILL.md`
@@ -114,7 +114,7 @@ python -c "import secrets; print(secrets.token_urlsafe(32))"
 
 ## 📊 Service Matrix
 
-| Feature | Tentackl | InkPass | Mimic |
+| Feature | Tentacle | InkPass | Mimic |
 |---------|----------|---------|-------|
 | **Language** | Python | Python | Python |
 | **Framework** | FastAPI | FastAPI | FastAPI |
@@ -166,4 +166,4 @@ make stop           # Stop everything
 make logs           # View logs
 ```
 
-**Remember:** Local development uses `docker-compose.yml`. For a standalone Tentackl stack, use `docker-compose.standalone.yml`.
+**Remember:** Local development uses `docker-compose.yml`. For a standalone Tentacle stack, use `docker-compose.standalone.yml`.

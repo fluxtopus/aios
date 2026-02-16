@@ -44,7 +44,7 @@ def upgrade() -> None:
         'webhook_deliveries',
         sa.Column('id', sa.String(), nullable=False),
         sa.Column('event_id', sa.String(), nullable=False),
-        sa.Column('target_service', sa.String(50), nullable=False),  # inkpass, tentackl, custom, etc.
+        sa.Column('target_service', sa.String(50), nullable=False),  # inkpass, tentacle, custom, etc.
         sa.Column('task_name', sa.String(255), nullable=False),  # Celery task name
         sa.Column('status', sa.String(20), server_default='pending'),  # pending, success, failed
         sa.Column('celery_task_id', sa.String(255), nullable=True),  # Celery task ID

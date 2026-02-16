@@ -137,7 +137,7 @@ if [ "$RUN_UNIT" = true ]; then
 
         # Some test suites expect service hostnames (e.g., `redis`, `postgres`) to be reachable.
         # Provide minimal sidecars when needed.
-        if [ "$name" = "Tentackl" ]; then
+        if [ "$name" = "Tentacle" ]; then
             test_network="unit-${path//\//-}"
             redis_container="${test_network}-redis"
             postgres_container="${test_network}-postgres"
@@ -150,22 +150,22 @@ if [ "$RUN_UNIT" = true ]; then
                 --name "$postgres_container" \
                 --network "$test_network" \
                 --network-alias postgres \
-                -e POSTGRES_USER=tentackl \
-                -e POSTGRES_PASSWORD=tentackl_pass \
-                -e POSTGRES_DB=tentackl_db \
+                -e POSTGRES_USER=tentacle \
+                -e POSTGRES_PASSWORD=tentacle_pass \
+                -e POSTGRES_DB=tentacle_db \
                 pgvector/pgvector:pg16 >/dev/null
 
             # Postgres may briefly restart during initdb; require a successful psql round-trip.
             # Avoid bash brace-expansion so this works even if braceexpand is disabled via shell config.
             for i in $(seq 1 90); do
-                if docker exec "$postgres_container" pg_isready -U tentackl -d postgres >/dev/null 2>&1 \
-                    && docker exec "$postgres_container" psql -U tentackl -d postgres -c "SELECT 1" >/dev/null 2>&1; then
+                if docker exec "$postgres_container" pg_isready -U tentacle -d postgres >/dev/null 2>&1 \
+                    && docker exec "$postgres_container" psql -U tentacle -d postgres -c "SELECT 1" >/dev/null 2>&1; then
                     break
                 fi
                 sleep 1
             done
-            if ! docker exec "$postgres_container" psql -U tentackl -d postgres -c "SELECT 1" >/dev/null 2>&1; then
-                echo -e "${RED}✗${NC} Tentackl Postgres sidecar did not become ready"
+            if ! docker exec "$postgres_container" psql -U tentacle -d postgres -c "SELECT 1" >/dev/null 2>&1; then
+                echo -e "${RED}✗${NC} Tentacle Postgres sidecar did not become ready"
                 docker logs --tail=80 "$postgres_container" || true
                 docker rm -f "$redis_container" >/dev/null 2>&1 || true
                 docker rm -f "$postgres_container" >/dev/null 2>&1 || true
@@ -174,24 +174,24 @@ if [ "$RUN_UNIT" = true ]; then
             fi
 
             # Ensure the requested DB exists (race-free across images/entrypoints).
-            tentackl_db_exists="$(
-                docker exec "$postgres_container" psql -U tentackl -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='tentackl_db'" 2>/dev/null \
+            tentacle_db_exists="$(
+                docker exec "$postgres_container" psql -U tentacle -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='tentacle_db'" 2>/dev/null \
                 | tr -d '[:space:]' \
                 || true
             )"
-            if [ "$tentackl_db_exists" != "1" ]; then
-                docker exec "$postgres_container" psql -U tentackl -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE tentackl_db;" >/dev/null
+            if [ "$tentacle_db_exists" != "1" ]; then
+                docker exec "$postgres_container" psql -U tentacle -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE tentacle_db;" >/dev/null
             fi
 
             # Wait for the requested DB to be available and enable pgvector.
             for i in $(seq 1 30); do
-                if docker exec "$postgres_container" psql -U tentackl -d tentackl_db -c "SELECT 1" >/dev/null 2>&1; then
+                if docker exec "$postgres_container" psql -U tentacle -d tentacle_db -c "SELECT 1" >/dev/null 2>&1; then
                     break
                 fi
                 sleep 1
             done
-            if ! docker exec "$postgres_container" psql -U tentackl -d tentackl_db -c "SELECT 1" >/dev/null 2>&1; then
-                echo -e "${RED}✗${NC} Tentackl Postgres sidecar DB 'tentackl_db' did not become available"
+            if ! docker exec "$postgres_container" psql -U tentacle -d tentacle_db -c "SELECT 1" >/dev/null 2>&1; then
+                echo -e "${RED}✗${NC} Tentacle Postgres sidecar DB 'tentacle_db' did not become available"
                 docker logs --tail=80 "$postgres_container" || true
                 docker rm -f "$redis_container" >/dev/null 2>&1 || true
                 docker rm -f "$postgres_container" >/dev/null 2>&1 || true
@@ -201,13 +201,13 @@ if [ "$RUN_UNIT" = true ]; then
 
             # Ensure pgvector extension exists (some models rely on it).
             for i in $(seq 1 30); do
-                if docker exec "$postgres_container" psql -U tentackl -d tentackl_db -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS vector;" >/dev/null 2>&1; then
+                if docker exec "$postgres_container" psql -U tentacle -d tentacle_db -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS vector;" >/dev/null 2>&1; then
                     break
                 fi
                 sleep 1
             done
-            if ! docker exec "$postgres_container" psql -U tentackl -d tentackl_db -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS vector;" >/dev/null 2>&1; then
-                echo -e "${RED}✗${NC} Tentackl Postgres sidecar could not enable pgvector"
+            if ! docker exec "$postgres_container" psql -U tentacle -d tentacle_db -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS vector;" >/dev/null 2>&1; then
+                echo -e "${RED}✗${NC} Tentacle Postgres sidecar could not enable pgvector"
                 docker logs --tail=80 "$postgres_container" || true
                 docker rm -f "$redis_container" >/dev/null 2>&1 || true
                 docker rm -f "$postgres_container" >/dev/null 2>&1 || true
@@ -216,7 +216,7 @@ if [ "$RUN_UNIT" = true ]; then
             fi
 
             env_args+=(
-                -e DATABASE_URL="postgresql://tentackl:tentackl_pass@postgres:5432/tentackl_db"
+                -e DATABASE_URL="postgresql://tentacle:tentacle_pass@postgres:5432/tentacle_db"
                 -e REDIS_URL="redis://redis:6379/0"
             )
         fi
@@ -341,7 +341,7 @@ if [ "$RUN_UNIT" = true ]; then
         fi
     }
 
-    run_py_unit "Tentackl" "apps/tentackl"
+    run_py_unit "Tentacle" "apps/tentacle"
     run_py_unit "InkPass" "apps/inkpass"
     run_py_unit "Mimic" "apps/mimic"
     echo ""

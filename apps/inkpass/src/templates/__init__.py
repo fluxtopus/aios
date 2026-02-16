@@ -3,7 +3,7 @@ Permission template system for InkPass.
 
 This module provides code-defined permission templates that are synced to
 the database via admin API. Templates define role-based permission sets
-for different product types (TENTACKL_SOLO, MIMIC_SOLO, etc.).
+for different product types (TENTACLE_SOLO, MIMIC_SOLO, etc.).
 """
 
 from src.templates.role_definitions import (
@@ -13,7 +13,7 @@ from src.templates.role_definitions import (
 )
 from src.templates.permission_templates import (
     TEMPLATE_REGISTRY,
-    TENTACKL_SOLO_TEMPLATE,
+    TENTACLE_SOLO_TEMPLATE,
     MIMIC_SOLO_TEMPLATE,
     INKPASS_SOLO_TEMPLATE,
     AIOS_BUNDLE_TEMPLATE,
@@ -27,7 +27,7 @@ __all__ = [
     "TemplateDefinition",
     # Templates
     "TEMPLATE_REGISTRY",
-    "TENTACKL_SOLO_TEMPLATE",
+    "TENTACLE_SOLO_TEMPLATE",
     "MIMIC_SOLO_TEMPLATE",
     "INKPASS_SOLO_TEMPLATE",
     "AIOS_BUNDLE_TEMPLATE",

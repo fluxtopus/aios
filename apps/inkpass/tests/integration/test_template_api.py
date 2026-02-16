@@ -45,7 +45,7 @@ class TestTemplateAPI:
         template_service = PermissionTemplateService(db)
         template_service.apply_template_to_organization(
             organization_id=org_id,
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=user_id,
         )
         db.commit()
@@ -188,7 +188,7 @@ class TestRoleAPI:
         template_service = PermissionTemplateService(db)
         template_service.apply_template_to_organization(
             organization_id=org_id,
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=user_id,
         )
         db.commit()
@@ -376,7 +376,7 @@ class TestPermissionCheckWithRoles:
         template_service = PermissionTemplateService(db)
         template_service.apply_template_to_organization(
             organization_id=org_id,
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=owner_id,
         )
         db.commit()

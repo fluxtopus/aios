@@ -24,10 +24,10 @@ class Settings(BaseSettings):
     # Redis (added for consistency)
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
-    # Tentackl Integration
-    TENTACKL_URL: str = os.getenv("TENTACKL_URL", "http://localhost:8005")
-    TENTACKL_API_KEY: Optional[str] = None
-    TENTACKL_INTERNAL_URL: str = os.getenv("TENTACKL_INTERNAL_URL", "http://tentackl:8000")
+    # Tentacle Integration
+    TENTACLE_URL: str = os.getenv("TENTACLE_URL", "http://localhost:8005")
+    TENTACLE_API_KEY: Optional[str] = None
+    TENTACLE_INTERNAL_URL: str = os.getenv("TENTACLE_INTERNAL_URL", "http://tentacle:8000")
 
     # InkPass Integration (for auth)
     INKPASS_URL: str = os.getenv("INKPASS_URL", "http://localhost:8004")
@@ -71,10 +71,10 @@ class Settings(BaseSettings):
     ANNUAL_SUBSCRIPTION_PRICE: int = 49900  # $499.00 in cents
 
     # Email Provider Selection
-    # Options: "dev" (SMTP), "postmark", "resend", "tentackl" (via workflow)
+    # Options: "dev" (SMTP), "postmark", "resend", "tentacle" (via workflow)
     EMAIL_PROVIDER: str = os.getenv("EMAIL_PROVIDER", "dev")
 
-    # Development SMTP (for testing without Tentackl/provider keys)
+    # Development SMTP (for testing without Tentacle/provider keys)
     # Supports Mailtrap, Mailhog, or any SMTP server
     DEV_SMTP_ENABLED: bool = os.getenv("DEV_SMTP_ENABLED", "false").lower() == "true"
     DEV_SMTP_HOST: str = os.getenv("DEV_SMTP_HOST", "mailpit")

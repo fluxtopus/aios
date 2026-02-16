@@ -348,7 +348,7 @@ class TestServiceAccountAuth:
     @pytest.fixture
     def service_headers(self, monkeypatch):
         """Set up service API key for testing."""
-        monkeypatch.setenv("SERVICE_API_KEYS", "tentackl:test-service-key-123")
+        monkeypatch.setenv("SERVICE_API_KEYS", "tentacle:test-service-key-123")
         return {"X-Service-API-Key": "test-service-key-123"}
 
     @pytest.mark.integration

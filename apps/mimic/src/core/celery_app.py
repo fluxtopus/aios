@@ -12,7 +12,7 @@ app = Celery(
 )
 
 # Configure Celery
-# Use a dedicated queue to avoid task stealing by other services (e.g. Tentackl)
+# Use a dedicated queue to avoid task stealing by other services (e.g. Tentacle)
 # sharing the same Redis broker.
 app.conf.update(
     task_serializer='json',

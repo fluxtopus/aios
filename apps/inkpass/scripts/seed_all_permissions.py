@@ -2,7 +2,7 @@
 """
 Seed all platform permissions for development.
 
-Creates all Tentackl, Mimic, and platform permissions in the database.
+Creates all Tentacle, Mimic, and platform permissions in the database.
 This script is designed to be idempotent - running it multiple times
 will not create duplicate permissions.
 
@@ -37,7 +37,7 @@ PermissionTuple = Tuple[str, str]
 # PERMISSION DEFINITIONS (synced with inkpass_sdk.dev_permissions)
 # =============================================================================
 
-TENTACKL_PERMISSIONS: Set[PermissionTuple] = {
+TENTACLE_PERMISSIONS: Set[PermissionTuple] = {
     # Workflows
     ("workflows", "view"),
     ("workflows", "create"),
@@ -171,7 +171,7 @@ AIOS_PERMISSIONS: Set[PermissionTuple] = {
 }
 
 # All new permissions (excluding InkPass core which already exists)
-ALL_NEW_PERMISSIONS = TENTACKL_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
+ALL_NEW_PERMISSIONS = TENTACLE_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
 
 
 # =============================================================================
@@ -276,7 +276,7 @@ def main():
     )
     parser.add_argument(
         "--service",
-        choices=["tentackl", "mimic", "aios", "all"],
+        choices=["tentacle", "mimic", "aios", "all"],
         default="all",
         help="Which service permissions to seed (default: all)",
     )
@@ -312,11 +312,11 @@ def main():
         # Determine which permissions to seed
         permissions_to_seed: Set[PermissionTuple] = set()
 
-        if args.service in ("tentackl", "all"):
-            print(f"Tentackl permissions ({len(TENTACKL_PERMISSIONS)}):")
-            c, s = seed_permissions(session, org_id, TENTACKL_PERMISSIONS, args.dry_run)
+        if args.service in ("tentacle", "all"):
+            print(f"Tentacle permissions ({len(TENTACLE_PERMISSIONS)}):")
+            c, s = seed_permissions(session, org_id, TENTACLE_PERMISSIONS, args.dry_run)
             print(f"  Created: {c}, Skipped: {s}\n")
-            permissions_to_seed |= TENTACKL_PERMISSIONS
+            permissions_to_seed |= TENTACLE_PERMISSIONS
 
         if args.service in ("mimic", "all"):
             print(f"Mimic permissions ({len(MIMIC_PERMISSIONS)}):")

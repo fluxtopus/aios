@@ -68,7 +68,7 @@ services:
       - DEV_PERMISSIONS=admin
       - DEV_USER_EMAIL=admin@fluxtopus.com
       # Service API keys for agent file operations (format: service:key,service:key)
-      - SERVICE_API_KEYS=tentackl:${TENTACKL_API_KEY:-sk_tentackl_dev}
+      - SERVICE_API_KEYS=tentacle:${TENTACLE_API_KEY:-sk_tentacle_dev}
       # Mimic integration for sending emails
       - MIMIC_URL=http://mimic:8000
       - MIMIC_API_KEY=sk_mimic_service_dev
@@ -92,23 +92,23 @@ services:
     networks:
       - aios-network
 
-  # Tentackl (orchestration API)
-  tentackl:
+  # Tentacle (orchestration API)
+  tentacle:
     build:
       context: .
-      dockerfile: ./apps/tentackl/Dockerfile
+      dockerfile: ./apps/tentacle/Dockerfile
     command: ./start.sh
     ports:
       - "8005:8000"
     environment:
       - APP_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres_master_pass@postgres:5432/aios_tentackl
+      - DATABASE_URL=postgresql://postgres:postgres_master_pass@postgres:5432/aios_tentacle
       - REDIS_URL=redis://redis:6379/5
       - CELERY_BROKER_URL=redis://redis:6379/5
       - CELERY_RESULT_BACKEND=redis://redis:6379/5
       - INKPASS_URL=http://inkpass:8000
       - INKPASS_JWT_SECRET=${INKPASS_JWT_SECRET_KEY:-dev-jwt-secret-key-change-in-production}
-      - INKPASS_SERVICE_API_KEY=${TENTACKL_API_KEY:-sk_tentackl_dev}
+      - INKPASS_SERVICE_API_KEY=${TENTACLE_API_KEY:-sk_tentacle_dev}
       # Mimic integration for sending emails/notifications
       - MIMIC_URL=http://mimic:8000
       - MIMIC_API_KEY=sk_mimic_service_dev
@@ -116,18 +116,18 @@ services:
       # CORS origins for frontend access
       - CORS_ORIGINS=http://localhost:3000,http://localhost:5173
     env_file:
-      - path: ./apps/tentackl/.env.example
+      - path: ./apps/tentacle/.env.example
         required: true
-      - path: ./apps/tentackl/.env
+      - path: ./apps/tentacle/.env
         required: false
     volumes:
-      - ./apps/tentackl/src:/app/src
-      - ./apps/tentackl/tests:/app/tests
-      - ./apps/tentackl/config:/app/config
-      - ./apps/tentackl/configs:/app/configs
-      - ./apps/tentackl/logs:/app/logs
-      - ./apps/tentackl/scripts:/app/scripts
-      - ./apps/tentackl/alembic:/app/alembic
+      - ./apps/tentacle/src:/app/src
+      - ./apps/tentacle/tests:/app/tests
+      - ./apps/tentacle/config:/app/config
+      - ./apps/tentacle/configs:/app/configs
+      - ./apps/tentacle/logs:/app/logs
+      - ./apps/tentacle/scripts:/app/scripts
+      - ./apps/tentacle/alembic:/app/alembic
       - ./packages:/app/packages
     depends_on:
       postgres:
@@ -145,70 +145,70 @@ services:
     networks:
       - aios-network
 
-  # Tentackl worker (Celery)
-  tentackl-worker:
+  # Tentacle worker (Celery)
+  tentacle-worker:
     build:
       context: .
-      dockerfile: ./apps/tentackl/Dockerfile
+      dockerfile: ./apps/tentacle/Dockerfile
     command: ./start-worker.sh
     environment:
       - APP_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres_master_pass@postgres:5432/aios_tentackl
+      - DATABASE_URL=postgresql://postgres:postgres_master_pass@postgres:5432/aios_tentacle
       - REDIS_URL=redis://redis:6379/5
       - CELERY_BROKER_URL=redis://redis:6379/5
       - CELERY_RESULT_BACKEND=redis://redis:6379/5
       - INKPASS_URL=http://inkpass:8000
       - INKPASS_JWT_SECRET=${INKPASS_JWT_SECRET_KEY:-dev-jwt-secret-key-change-in-production}
-      - INKPASS_SERVICE_API_KEY=${TENTACKL_API_KEY:-sk_tentackl_dev}
+      - INKPASS_SERVICE_API_KEY=${TENTACLE_API_KEY:-sk_tentacle_dev}
       - MIMIC_URL=http://mimic:8000
       - MIMIC_API_KEY=sk_mimic_service_dev
     env_file:
-      - path: ./apps/tentackl/.env.example
+      - path: ./apps/tentacle/.env.example
         required: true
-      - path: ./apps/tentackl/.env
+      - path: ./apps/tentacle/.env
         required: false
     volumes:
-      - ./apps/tentackl/src:/app/src
-      - ./apps/tentackl/config:/app/config
-      - ./apps/tentackl/logs:/app/logs
+      - ./apps/tentacle/src:/app/src
+      - ./apps/tentacle/config:/app/config
+      - ./apps/tentacle/logs:/app/logs
       - ./packages:/app/packages
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-      tentackl:
+      tentacle:
         condition: service_healthy
     networks:
       - aios-network
 
-  # Tentackl scheduler (Celery beat)
-  tentackl-beat:
+  # Tentacle scheduler (Celery beat)
+  tentacle-beat:
     build:
       context: .
-      dockerfile: ./apps/tentackl/Dockerfile
+      dockerfile: ./apps/tentacle/Dockerfile
     command: ./start-beat.sh
     environment:
       - APP_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres_master_pass@postgres:5432/aios_tentackl
+      - DATABASE_URL=postgresql://postgres:postgres_master_pass@postgres:5432/aios_tentacle
       - REDIS_URL=redis://redis:6379/5
       - CELERY_BROKER_URL=redis://redis:6379/5
       - CELERY_RESULT_BACKEND=redis://redis:6379/5
       - INKPASS_URL=http://inkpass:8000
       - INKPASS_JWT_SECRET=${INKPASS_JWT_SECRET_KEY:-dev-jwt-secret-key-change-in-production}
-      - INKPASS_SERVICE_API_KEY=${TENTACKL_API_KEY:-sk_tentackl_dev}
+      - INKPASS_SERVICE_API_KEY=${TENTACLE_API_KEY:-sk_tentacle_dev}
     env_file:
-      - path: ./apps/tentackl/.env.example
+      - path: ./apps/tentacle/.env.example
         required: true
-      - path: ./apps/tentackl/.env
+      - path: ./apps/tentacle/.env
         required: false
     volumes:
-      - ./apps/tentackl/src:/app/src
+      - ./apps/tentacle/src:/app/src
       - ./packages:/app/packages
     depends_on:
       redis:
         condition: service_healthy
-      tentackl-worker:
+      tentacle-worker:
         condition: service_started
     networks:
       - aios-network
@@ -224,7 +224,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:postgres_master_pass@postgres:5432/aios_mimic
       - REDIS_URL=redis://redis:6379/6
-      - TENTACKL_URL=http://tentackl:8000
+      - TENTACLE_URL=http://tentacle:8000
       - INKPASS_URL=http://inkpass:8000
       - ENCRYPTION_KEY=${MIMIC_ENCRYPTION_KEY:-dev-encryption-key-32-chars-long}
       - SECRET_KEY=${MIMIC_SECRET_KEY:-dev-secret-key-change-in-production}
@@ -258,7 +258,7 @@ services:
         condition: service_healthy
       inkpass:
         condition: service_healthy
-      tentackl:
+      tentacle:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -280,8 +280,8 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/6
       - CELERY_RESULT_BACKEND=redis://redis:6379/6
       - CELERY_CONCURRENCY=2
-      - TENTACKL_URL=http://tentackl:8000
-      - TENTACKL_INTERNAL_URL=http://tentackl:8000
+      - TENTACLE_URL=http://tentacle:8000
+      - TENTACLE_INTERNAL_URL=http://tentacle:8000
       - INKPASS_INTERNAL_URL=http://inkpass:8000
       - MIMIC_SERVICE_API_KEY=${MIMIC_SERVICE_API_KEY:-sk_mimic_service_dev}
       - ENCRYPTION_KEY=${MIMIC_ENCRYPTION_KEY:-dev-encryption-key-32-chars-long}
@@ -295,33 +295,33 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      tentackl:
+      tentacle:
         condition: service_healthy
       mimic:
         condition: service_healthy
     networks:
       - aios-network
 
-  # Tentackl UI
-  tentackl-ui:
+  # Tentacle UI
+  tentacle-ui:
     build:
-      context: ./frontends/tentackl-ui
+      context: ./frontends/tentacle-ui
       dockerfile: Dockerfile.dev
     command: npm run dev
     ports:
       - "3000:3000"
     environment:
-      - API_URL=http://tentackl:8000
+      - API_URL=http://tentacle:8000
       - INKPASS_API_URL=http://inkpass:8000
       - NEXT_PUBLIC_API_URL=http://localhost:8005
       - NEXT_PUBLIC_INKPASS_API_URL=http://localhost:8004
       - NODE_ENV=development
     volumes:
-      - ./frontends/tentackl-ui:/app
+      - ./frontends/tentacle-ui:/app
       - /app/node_modules
       - /app/.next
     depends_on:
-      - tentackl
+      - tentacle
     networks:
       - aios-network
 
@@ -334,14 +334,14 @@ services:
       - "3002:3002"
     environment:
       - NODE_ENV=development
-      - TENTACKL_API_URL=http://tentackl:8000
-      - TENTACKL_SERVICE_TOKEN=${TENTACKL_API_KEY:-sk_tentackl_dev}
+      - TENTACLE_API_URL=http://tentacle:8000
+      - TENTACLE_SERVICE_TOKEN=${TENTACLE_API_KEY:-sk_tentacle_dev}
     volumes:
       - ./frontends/aios-landing:/app
       - /app/node_modules
       - /app/.next
     depends_on:
-      - tentackl
+      - tentacle
     networks:
       - aios-network
 

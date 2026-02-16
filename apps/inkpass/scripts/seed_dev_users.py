@@ -7,7 +7,7 @@ Creates test accounts:
 2. free@example.com - Free user (no subscription)
 3. plus@example.com - Plus user (active subscription)
 
-Each user gets their own organization and Tentackl platform permissions.
+Each user gets their own organization and Tentacle platform permissions.
 
 Run with:
     docker compose exec inkpass python scripts/seed_dev_users.py
@@ -26,7 +26,7 @@ from src.services.auth_service import AuthService
 from src.services.permission_service import PermissionService
 from src.templates.permission_templates import (
     INKPASS_CORE_PERMISSIONS,
-    TENTACKL_PERMISSIONS,
+    TENTACLE_PERMISSIONS,
     MIMIC_PERMISSIONS,
     AIOS_PERMISSIONS,
 )
@@ -101,9 +101,9 @@ def seed_user(session, user_data: dict) -> bool:
         # User exists — ensure their org has permissions and the user has them assigned.
         is_admin = existing.email == "admin@fluxtopus.com"
         perms_to_seed = (
-            INKPASS_CORE_PERMISSIONS | TENTACKL_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
+            INKPASS_CORE_PERMISSIONS | TENTACLE_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
             if is_admin
-            else TENTACKL_PERMISSIONS
+            else TENTACLE_PERMISSIONS
         )
         perm_count = seed_permissions_for_org(session, str(existing.organization_id), perms_to_seed)
         assigned = assign_all_permissions_to_user(session, existing, str(existing.organization_id))
@@ -141,9 +141,9 @@ def seed_user(session, user_data: dict) -> bool:
         org_id = str(result["organization_id"])
         is_admin = created_user.email == "admin@fluxtopus.com"
         perms_to_seed = (
-            INKPASS_CORE_PERMISSIONS | TENTACKL_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
+            INKPASS_CORE_PERMISSIONS | TENTACLE_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
             if is_admin
-            else TENTACKL_PERMISSIONS
+            else TENTACLE_PERMISSIONS
         )
         perm_count = seed_permissions_for_org(session, org_id, perms_to_seed)
         assigned = assign_all_permissions_to_user(session, created_user, org_id)

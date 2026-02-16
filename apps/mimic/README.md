@@ -112,7 +112,7 @@ Tracks delivery of events to downstream services.
 ```python
 id: UUID
 event_id: UUID         # FK to WebhookEvent
-target_service: str    # inkpass, tentackl, custom, etc.
+target_service: str    # inkpass, tentacle, custom, etc.
 task_name: str         # Celery task name
 celery_task_id: str
 status: str            # pending, dispatched, success, failed
@@ -162,7 +162,7 @@ curl -X POST http://localhost:8006/api/v1/gateway/webhooks/stripe/test \
         "customer": "cus_test_123",
         "customer_email": "test@example.com",
         "subscription": "sub_test_123",
-        "metadata": {"product_type": "tentackl_solo"}
+        "metadata": {"product_type": "tentacle_solo"}
       }
     }
   }'

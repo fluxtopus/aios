@@ -27,7 +27,7 @@
       "title": "Log Volume by Worker",
       "type": "timeseries",
       "targets": [
-        { "expr": "sum(count_over_time({service=~\"tentackl-worker|tentackl-beat|mimic-worker\"} [1m])) by (service)", "legendFormat": "{{service}}", "refId": "A" }
+        { "expr": "sum(count_over_time({service=~\"tentacle-worker|tentacle-beat|mimic-worker\"} [1m])) by (service)", "legendFormat": "{{service}}", "refId": "A" }
       ]
     },
     {
@@ -41,9 +41,9 @@
       "gridPos": { "h": 6, "w": 4, "x": 16, "y": 1 },
       "id": 2,
       "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto" },
-      "title": "Tentackl Worker Errors (5m)",
+      "title": "Tentacle Worker Errors (5m)",
       "type": "stat",
-      "targets": [{ "expr": "sum(count_over_time({service=\"tentackl-worker\"} |~ \"(?i)(error|exception|traceback)\" [5m])) or vector(0)", "refId": "A" }]
+      "targets": [{ "expr": "sum(count_over_time({service=\"tentacle-worker\"} |~ \"(?i)(error|exception|traceback)\" [5m])) or vector(0)", "refId": "A" }]
     },
     {
       "datasource": { "type": "loki", "uid": "loki" },
@@ -64,7 +64,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
       "id": 101,
-      "title": "Tentackl Worker",
+      "title": "Tentacle Worker",
       "type": "row"
     },
     {
@@ -81,11 +81,11 @@
         "sortOrder": "Descending",
         "dedupStrategy": "none"
       },
-      "title": "Tentackl Worker Logs",
+      "title": "Tentacle Worker Logs",
       "type": "logs",
       "targets": [
         {
-          "expr": "{service=\"tentackl-worker\"} | $log_filter",
+          "expr": "{service=\"tentacle-worker\"} | $log_filter",
           "refId": "A"
         }
       ]
@@ -94,7 +94,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
       "id": 102,
-      "title": "Tentackl Beat",
+      "title": "Tentacle Beat",
       "type": "row"
     },
     {
@@ -111,11 +111,11 @@
         "sortOrder": "Descending",
         "dedupStrategy": "none"
       },
-      "title": "Tentackl Beat Logs",
+      "title": "Tentacle Beat Logs",
       "type": "logs",
       "targets": [
         {
-          "expr": "{service=\"tentackl-beat\"} | $log_filter",
+          "expr": "{service=\"tentacle-beat\"} | $log_filter",
           "refId": "A"
         }
       ]
@@ -175,7 +175,7 @@
       "type": "logs",
       "targets": [
         {
-          "expr": "{service=~\"tentackl-worker|tentackl-beat|mimic-worker\"} | $log_filter",
+          "expr": "{service=~\"tentacle-worker|tentacle-beat|mimic-worker\"} | $log_filter",
           "refId": "A"
         }
       ]

@@ -299,7 +299,7 @@ async def agent_upload_file(
 ):
     """
     Agent file upload endpoint (service account auth).
-    Used by Tentackl agents to create files programmatically.
+    Used by Tentacle agents to create files programmatically.
     """
     # Check file size
     file.file.seek(0, 2)

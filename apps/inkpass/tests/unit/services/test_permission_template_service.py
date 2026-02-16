@@ -59,7 +59,7 @@ class TestPermissionTemplateService:
 
         # Clear any existing template for this product type (delete in order due to FK constraints)
         template = db.query(PermissionTemplate).filter(
-            PermissionTemplate.product_type == ProductType.TENTACKL_SOLO.value
+            PermissionTemplate.product_type == ProductType.TENTACLE_SOLO.value
         ).first()
         if template:
             role_ids = [r.id for r in db.query(RoleTemplate.id).filter(RoleTemplate.template_id == template.id).all()]
@@ -73,10 +73,10 @@ class TestPermissionTemplateService:
             db.commit()
 
         # Get or create should create
-        template = service.get_or_create_template(ProductType.TENTACKL_SOLO)
+        template = service.get_or_create_template(ProductType.TENTACLE_SOLO)
 
         assert template is not None
-        assert template.product_type == ProductType.TENTACKL_SOLO.value
+        assert template.product_type == ProductType.TENTACLE_SOLO.value
         assert template.version >= 1
         assert template.is_active is True
 
@@ -85,12 +85,12 @@ class TestPermissionTemplateService:
         service = PermissionTemplateService(db)
 
         # Create template first
-        template1 = service.get_or_create_template(ProductType.TENTACKL_SOLO)
+        template1 = service.get_or_create_template(ProductType.TENTACLE_SOLO)
         template_id = template1.id
         db.commit()
 
         # Get again - should return same template
-        template2 = service.get_or_create_template(ProductType.TENTACKL_SOLO)
+        template2 = service.get_or_create_template(ProductType.TENTACLE_SOLO)
 
         assert template2.id == template_id
 
@@ -100,7 +100,7 @@ class TestPermissionTemplateService:
 
         org_template = service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
 
@@ -114,7 +114,7 @@ class TestPermissionTemplateService:
 
         service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
         db.commit()
@@ -135,7 +135,7 @@ class TestPermissionTemplateService:
 
         org_template = service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
         db.commit()
@@ -158,7 +158,7 @@ class TestPermissionTemplateService:
         # Apply template
         service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
         db.commit()
@@ -183,14 +183,14 @@ class TestPermissionTemplateService:
 
         org_template1 = service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
         db.commit()
 
         org_template2 = service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
 
@@ -203,7 +203,7 @@ class TestPermissionTemplateService:
         with pytest.raises(ValueError, match="not found"):
             service.apply_template_to_organization(
                 organization_id="non-existent-org-id",
-                product_type=ProductType.TENTACKL_SOLO,
+                product_type=ProductType.TENTACLE_SOLO,
                 owner_user_id=org_with_owner["user_id"],
             )
 
@@ -257,7 +257,7 @@ class TestPermissionTemplateService:
         )
         perm_set = {(p["resource"], p["action"]) for p in permissions}
 
-        # Should have permissions for Tentackl resources
+        # Should have permissions for Tentacle resources
         assert ("workflows", "create") in perm_set
         assert ("agents", "execute") in perm_set
         assert ("plans", "create") in perm_set
@@ -277,7 +277,7 @@ class TestPermissionTemplateService:
 
         template_service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
         db.commit()
@@ -289,7 +289,7 @@ class TestPermissionTemplateService:
         )
 
         # Get expected count from template definition
-        template_def = TEMPLATE_REGISTRY[ProductType.TENTACKL_SOLO]
+        template_def = TEMPLATE_REGISTRY[ProductType.TENTACLE_SOLO]
         owner_role_def = next(r for r in template_def.roles if r.name == "owner")
         expected_count = len(owner_role_def.permissions)
 
@@ -304,7 +304,7 @@ class TestPermissionTemplateService:
 
         template_service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
         db.commit()

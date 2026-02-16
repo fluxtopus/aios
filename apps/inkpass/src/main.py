@@ -63,11 +63,11 @@ def setup_dev_permissions():
     # Import permission definitions
     try:
         from scripts.seed_all_permissions import (
-            TENTACKL_PERMISSIONS,
+            TENTACLE_PERMISSIONS,
             MIMIC_PERMISSIONS,
             AIOS_PERMISSIONS,
         )
-        ALL_NEW_PERMISSIONS = TENTACKL_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
+        ALL_NEW_PERMISSIONS = TENTACLE_PERMISSIONS | MIMIC_PERMISSIONS | AIOS_PERMISSIONS
     except ImportError:
         logger.warning("Could not import permission definitions from seed script")
         return

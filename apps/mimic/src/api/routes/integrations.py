@@ -309,7 +309,7 @@ class InboundConfigCreate(BaseModel):
         description="Jinja2 template for payload transformation"
     )
     destination_service: DestinationService = Field(
-        default=DestinationService.tentackl,
+        default=DestinationService.tentacle,
         description="Service to route events to"
     )
     destination_config: Optional[dict] = Field(

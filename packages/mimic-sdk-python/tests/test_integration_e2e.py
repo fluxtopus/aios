@@ -243,7 +243,7 @@ class TestSDKIntegration:
                 integration_id,
                 InboundConfigCreate(
                     auth_method=InboundAuthMethod.none,
-                    destination_service=DestinationService.tentackl,
+                    destination_service=DestinationService.tentacle,
                     destination_config={"agent_id": "test-agent"},
                 ),
                 token=auth_token,

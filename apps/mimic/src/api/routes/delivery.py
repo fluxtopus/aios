@@ -7,10 +7,10 @@ from typing import Annotated, Optional, Dict, Any
 from src.database.database import get_db
 from src.database.models import DeliveryLog, Workflow
 from src.api.auth import require_permission, AuthContext
-from src.clients.tentackl_client import TentacklClient
+from src.clients.tentacle_client import TentacleClient
 
 router = APIRouter()
-tentackl_client = TentacklClient()
+tentacle_client = TentacleClient()
 
 
 class DeliveryStatusResponse(BaseModel):
@@ -54,14 +54,14 @@ async def get_delivery_status(
             error_message=None
         )
     
-    # Try to get execution status from Tentackl
+    # Try to get execution status from Tentacle
     execution_tree = None
     try:
         if delivery_log.delivery_id:
-            # Query Tentackl for execution status
-            execution_tree = await tentackl_client.get_workflow_status(delivery_log.delivery_id)
+            # Query Tentacle for execution status
+            execution_tree = await tentacle_client.get_workflow_status(delivery_log.delivery_id)
     except Exception as e:
-        # If Tentackl query fails, return database status
+        # If Tentacle query fails, return database status
         pass
     
     return DeliveryStatusResponse(

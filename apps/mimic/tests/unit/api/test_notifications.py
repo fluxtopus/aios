@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 
 @pytest.mark.unit
-def test_send_notification(client, test_user_annual, mock_tentackl_client, db_session, mock_inkpass_auth):
+def test_send_notification(client, test_user_annual, mock_tentacle_client, db_session, mock_inkpass_auth):
     """Test sending a notification"""
     from src.api.routes.auth import hash_api_key
     from src.database.models import APIKey
@@ -54,7 +54,7 @@ def test_send_notification(client, test_user_annual, mock_tentackl_client, db_se
 
 
 @pytest.mark.unit
-def test_send_notification_no_provider_key(client, test_user_annual, mock_tentackl_client, db_session, mock_inkpass_auth):
+def test_send_notification_no_provider_key(client, test_user_annual, mock_tentacle_client, db_session, mock_inkpass_auth):
     """Test sending notification without provider key"""
     from src.api.routes.auth import hash_api_key
     from src.database.models import APIKey

@@ -124,7 +124,7 @@ class TestAdminTemplateSyncService:
         template_service = PermissionTemplateService(db)
         org_template = template_service.apply_template_to_organization(
             organization_id=org_with_owner["org_id"],
-            product_type=ProductType.TENTACKL_SOLO,
+            product_type=ProductType.TENTACLE_SOLO,
             owner_user_id=org_with_owner["user_id"],
         )
         db.commit()

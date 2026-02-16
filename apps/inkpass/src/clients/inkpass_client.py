@@ -2,7 +2,7 @@
 inkPass Client Library
 
 A client library for integrating with the inkPass authentication and authorization service.
-Follows Tentackl architecture patterns with async/await, retry logic, and error handling.
+Follows Tentacle architecture patterns with async/await, retry logic, and error handling.
 """
 
 from typing import Optional, Dict, Any, List
@@ -53,7 +53,7 @@ class InkPassClient:
     """
     Async client for inkPass authentication and authorization service.
 
-    This client follows Tentackl architecture patterns:
+    This client follows Tentacle architecture patterns:
     - Async/await for all I/O operations
     - Retry logic with exponential backoff
     - Comprehensive error handling

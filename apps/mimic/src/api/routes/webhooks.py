@@ -76,7 +76,7 @@ async def receive_webhook_callback(
     auth: Annotated[AuthContext, Depends(require_permission("webhooks", "configure"))],
     db: Session = Depends(get_db)
 ):
-    """Receive webhook callback from Tentackl (internal use)"""
+    """Receive webhook callback from Tentacle (internal use)"""
     # Update delivery log
     delivery_log = db.query(DeliveryLog).filter(
         DeliveryLog.delivery_id == callback.delivery_id,
