@@ -1,6 +1,6 @@
 # aios-agent
 
-Python port of `pi-mono/packages/agent`.
+Python port of `pi-mono/packages/agent` [https://github.com/badlogic/pi-mono/tree/main/packages/agent].
 
 `aios-agent` provides:
 - Stateful agent runtime (`Agent`) with prompt/continue flows
