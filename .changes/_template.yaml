@@ -1,0 +1,3 @@
+component: app-tentacle
+bump: patch
+summary: "Describe the user-visible change"

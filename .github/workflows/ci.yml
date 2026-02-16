@@ -6,6 +6,74 @@ on:
   pull_request:
 
 jobs:
+  release-metadata:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install release dependencies
+        shell: bash
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pyyaml
+
+      - name: Determine commit range
+        id: range
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+            HEAD="${{ github.sha }}"
+            if [[ "$BASE" == "0000000000000000000000000000000000000000" ]]; then
+              BASE="$(git rev-list --max-parents=0 HEAD)"
+            fi
+          fi
+
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD" >> "$GITHUB_OUTPUT"
+
+      - name: Detect changed components
+        shell: bash
+        run: |
+          ./scripts/release/detect-components.sh \
+            --base "${{ steps.range.outputs.base }}" \
+            --head "${{ steps.range.outputs.head }}" \
+            --config release/components.yaml \
+            --output /tmp/changed-components.json
+
+      - name: Validate release notes for component changes
+        if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'release/auto-')
+        shell: bash
+        run: |
+          ./scripts/release/validate-change-notes.sh \
+            --base "${{ steps.range.outputs.base }}" \
+            --head "${{ steps.range.outputs.head }}" \
+            --config release/components.yaml \
+            --changed /tmp/changed-components.json \
+            --changes-dir .changes
+
+      - name: Validate version sync
+        shell: bash
+        run: |
+          ./scripts/release/check-version-sync.sh \
+            --config release/components.yaml \
+            --manifest manifest.yaml
+
   docker-checks-and-unit:
     runs-on: ubuntu-latest
     permissions:

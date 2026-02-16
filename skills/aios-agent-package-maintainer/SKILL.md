@@ -5,54 +5,87 @@ description: Maintain and release the aios-agent Python package with consistent 
 
 # AIOS Agent Package Maintainer
 
-## Overview
+Use this skill when a task touches `packages/aios-agent` versioning, changelog, packaging, or publishing.
 
-Use this skill to manage updates to `aios-agent` safely and consistently.
-Always keep version, changelog, tests, and release artifacts in sync.
-
-## Source Of Truth
+## Sources Of Truth
 
 - Package root: `packages/aios-agent`
-- Version file: `packages/aios-agent/pyproject.toml`
-- Change log: `packages/aios-agent/CHANGELOG.md`
-- Package docs: `packages/aios-agent/README.md`
+- Version source: `packages/aios-agent/pyproject.toml`
+- Runtime version: `packages/aios-agent/aios_agent/version.py`
+- Package changelog: `packages/aios-agent/CHANGELOG.md`
+- Platform manifest snapshot: `manifest.yaml`
+- Release plan metadata: `release/latest-release-plan.json`
 
-## Workflow
+## Required PR Metadata
 
-1. Confirm release intent and change scope.
-2. Inspect package deltas.
-3. Update version and changelog in the same change set.
-4. Run package validation (tests and lint/type checks when available).
-5. Build distribution artifacts.
-6. Publish only when explicitly requested and credentials are configured.
-7. Record release commit/tag and summary in PR notes.
+If a PR changes `packages/aios-agent/**`, add one note in `.changes/`:
 
-## Standard Commands
+```yaml
+component: pkg-aios-agent
+bump: patch
+summary: "Short user-visible change summary"
+```
 
-Run commands from:
-`packages/aios-agent`
+Use bump values: `patch|minor|major`.
+
+## Standard Workflow
+
+1. Inspect package changes (`git diff -- packages/aios-agent`).
+2. Add/update tests and docs for behavior changes.
+3. Add `.changes/*.yaml` note for `pkg-aios-agent`.
+4. Validate version consistency:
+   - `./scripts/release/check-version-sync.sh --config release/components.yaml --manifest manifest.yaml`
+5. Build package artifacts when needed:
+   - `./scripts/publish-python-packages.sh --build-only --package aios-agent`
+6. Publish only via approved release workflow after merge.
+
+## How To Cut A Release
+
+1. Merge PR(s) with valid `.changes` notes.
+2. Review generated release PR (`chore(release): prepare ...`).
+3. Merge release PR.
+4. Approve `Publish Release` workflow environment gate.
+5. Confirm `pkg-aios-agent@x.y.z` tag and manifest artifact.
+
+## Automation vs Manual
+
+Automated:
+
+- Release PR generation from `.changes` notes (`Prepare Release PR` workflow).
+- Version bumping, manifest regeneration, note archiving, and changelog update.
+- Publish/build + tag creation after release PR merge (`Publish Release` workflow).
+
+Manual:
+
+- Review and merge release PR.
+- Approve `release` environment in GitHub Actions.
+- Confirm publish outputs and tags.
+
+Optional CLI automation for developer-created PRs:
 
 ```bash
-# Inspect package changes
-git log --oneline -- packages/aios-agent
-git diff -- packages/aios-agent
-
-# Run unit tests
-pytest tests/unit -v
-
-# Build package
-python -m build
-
-# Publish (if requested)
-uv publish
+git checkout -b <branch>
+git add -A
+git commit -m "chore(release): ... "
+git push -u origin <branch>
+gh pr create --fill
 ```
+
+## How To Roll Back
+
+1. Identify target platform tag and load its `manifest.yaml` artifact.
+2. Restore `pkg-aios-agent` version from that manifest.
+3. Run:
+   - `./scripts/release/update-manifest.sh --config release/components.yaml --output manifest.yaml`
+   - `./scripts/release/check-version-sync.sh --config release/components.yaml --manifest manifest.yaml`
+4. Merge rollback PR and run publish workflow with approval.
 
 ## Release Checklist
 
-Use:
-`references/release-checklist.md`
+Use `references/release-checklist.md`.
 
 Always enforce:
-- Every version bump must include a matching `CHANGELOG.md` section.
-- No publish step before tests/build pass.
-- No release without explicit user approval.
+
+- Version bump + changelog updates are part of the same change set.
+- No publish before tests/build pass.
+- No release without explicit approval.

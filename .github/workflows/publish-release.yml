@@ -1,0 +1,153 @@
+name: Publish Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - manifest.yaml
+      - release/latest-release-plan.json
+  workflow_dispatch:
+
+concurrency:
+  group: publish-release-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install release dependencies
+        shell: bash
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pyyaml
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Read release plan metadata
+        id: plan
+        shell: bash
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+
+          import yaml
+
+          plan_file = Path('release/latest-release-plan.json')
+          if not plan_file.exists():
+              print('has_changes=false')
+              print('has_python_packages=false')
+              print('has_typescript_packages=false')
+              print('python_package_dirs=')
+              raise SystemExit(0)
+
+          plan = json.loads(plan_file.read_text(encoding='utf-8'))
+          components = yaml.safe_load(Path('release/components.yaml').read_text(encoding='utf-8'))['components']
+          by_name = {c['name']: c for c in components}
+
+          changed = [c['name'] for c in plan.get('components', [])]
+          python_dirs = []
+          has_ts_pkg = False
+          for name in changed:
+              comp = by_name[name]
+              if comp.get('kind') == 'python-package':
+                  python_dirs.append(Path(comp['publish_dir']).name)
+              if comp.get('kind') == 'typescript-package':
+                  has_ts_pkg = True
+
+          print(f"has_changes={'true' if changed else 'false'}")
+          print(f"has_python_packages={'true' if python_dirs else 'false'}")
+          print(f"has_typescript_packages={'true' if has_ts_pkg else 'false'}")
+          print(f"python_package_dirs={','.join(python_dirs)}")
+          PY
+
+      - name: Stop when no release plan components exist
+        if: steps.plan.outputs.has_changes != 'true'
+        shell: bash
+        run: |
+          echo "No components in release/latest-release-plan.json; skipping publish."
+          exit 0
+
+      - name: Build changed Python packages
+        if: steps.plan.outputs.has_python_packages == 'true'
+        shell: bash
+        run: |
+          IFS=',' read -r -a pkgs <<< "${{ steps.plan.outputs.python_package_dirs }}"
+          args=()
+          for pkg in "${pkgs[@]}"; do
+            [[ -z "$pkg" ]] && continue
+            args+=(--package "$pkg")
+          done
+          ./scripts/publish-python-packages.sh --build-only "${args[@]}"
+
+      - name: Build changed TypeScript package
+        if: steps.plan.outputs.has_typescript_packages == 'true'
+        shell: bash
+        run: |
+          cd packages/mimic-sdk-ts
+          npm ci
+          npm run build
+
+      - name: Publish changed Python packages
+        if: steps.plan.outputs.has_python_packages == 'true' && secrets.PYPI_API_TOKEN != ''
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        shell: bash
+        run: |
+          IFS=',' read -r -a pkgs <<< "${{ steps.plan.outputs.python_package_dirs }}"
+          args=()
+          for pkg in "${pkgs[@]}"; do
+            [[ -z "$pkg" ]] && continue
+            args+=(--package "$pkg")
+          done
+          ./scripts/publish-python-packages.sh --publish --index pypi "${args[@]}"
+
+      - name: Publish changed TypeScript package
+        if: steps.plan.outputs.has_typescript_packages == 'true' && secrets.NPM_TOKEN != ''
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        shell: bash
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          cd packages/mimic-sdk-ts
+          npm publish --access public
+
+      - name: Create and push immutable tags
+        shell: bash
+        run: |
+          ./scripts/release/tag-release.sh \
+            --plan release/latest-release-plan.json \
+            --manifest manifest.yaml \
+            --push
+
+      - name: Upload manifest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-manifest-${{ github.sha }}
+          path: |
+            manifest.yaml
+            release/latest-release-plan.json
+            releases/CHANGELOG.md
