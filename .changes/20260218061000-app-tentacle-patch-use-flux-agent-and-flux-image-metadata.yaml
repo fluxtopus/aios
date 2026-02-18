@@ -1,0 +1,3 @@
+component: app-tentacle
+bump: patch
+summary: "Use flux-agent in Tentacle production images and align app image metadata to flux-* repositories"

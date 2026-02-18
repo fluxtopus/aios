@@ -40,15 +40,27 @@ def next_platform_release_id(existing_manifest: dict[str, Any] | None) -> str:
 
 def component_manifest_entry(repo_root: Path, component: dict[str, Any]) -> dict[str, Any]:
     source_files = version_source_files(component)
+    artifact: dict[str, Any] = {}
+
+    publish_dir = component.get("publish_dir")
+    if publish_dir is not None:
+        artifact["publish_dir"] = publish_dir
+
+    image_repository = component.get("image_repository")
+    if image_repository:
+        artifact["image_repository"] = image_repository
+
+    dockerfile = component.get("dockerfile")
+    if dockerfile:
+        artifact["dockerfile"] = dockerfile
+
     return {
         "scope": component.get("scope"),
         "kind": component.get("kind"),
         "version": read_component_version(repo_root, component),
         "version_sources": source_files,
         "version_sources_digest": digest_files(repo_root, source_files),
-        "artifact": {
-            "publish_dir": component.get("publish_dir"),
-        },
+        "artifact": artifact,
     }
 
 

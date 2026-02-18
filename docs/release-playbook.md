@@ -20,6 +20,9 @@ This repository uses independent component SemVer and a root platform manifest.
   - `pyproject.toml`, `package.json`, `setup.py`, `__version__` files as defined in `release/components.yaml`
 - Platform snapshot:
   - `manifest.yaml`
+- App image repositories:
+  - Defined in `release/components.yaml` via `image_repository`
+  - Current naming convention uses `flux-` prefix (for example `ghcr.io/fluxtopus/flux-tentacle`)
 
 ## Release Notes Contract (`.changes`)
 

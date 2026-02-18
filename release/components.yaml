@@ -30,6 +30,8 @@ components:
     version:
       kind: plain
       file: apps/tentacle/VERSION
+    image_repository: ghcr.io/fluxtopus/flux-tentacle
+    dockerfile: apps/tentacle/Dockerfile.prod
 
   - name: app-inkpass
     scope: inkpass
@@ -39,6 +41,8 @@ components:
     version:
       kind: plain
       file: apps/inkpass/VERSION
+    image_repository: ghcr.io/fluxtopus/flux-inkpass
+    dockerfile: apps/inkpass/Dockerfile.prod
 
   - name: app-mimic
     scope: mimic
@@ -48,6 +52,8 @@ components:
     version:
       kind: plain
       file: apps/mimic/VERSION
+    image_repository: ghcr.io/fluxtopus/flux-mimic
+    dockerfile: apps/mimic/Dockerfile.prod
 
   - name: pkg-flux-agent
     scope: flux-agent
