@@ -1,0 +1,3 @@
+component: app-mimic
+bump: patch
+summary: "Force a patch release to publish Mimic container image to GHCR."
