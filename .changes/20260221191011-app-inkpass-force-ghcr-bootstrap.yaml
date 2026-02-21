@@ -1,0 +1,3 @@
+component: app-inkpass
+bump: patch
+summary: "Force a patch release to publish InkPass container image to GHCR."
