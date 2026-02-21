@@ -494,7 +494,8 @@ async def observe_task(
         - heartbeat: Keep-alive ping (every 30 seconds)
     """
     async def event_generator():
-        async for event in use_cases.observe_execution(task_id, user.id):
+        event_stream = await use_cases.observe_execution(task_id, user.id)
+        async for event in event_stream:
             yield f"data: {json.dumps(event)}\n\n"
 
     return StreamingResponse(

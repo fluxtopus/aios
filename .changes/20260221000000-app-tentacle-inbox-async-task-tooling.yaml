@@ -1,0 +1,3 @@
+component: app-tentacle
+bump: patch
+summary: "Stabilize inbox task tool orchestration: wait/poll behavior, get_task_status fallback wiring, and task observe streaming fix."
