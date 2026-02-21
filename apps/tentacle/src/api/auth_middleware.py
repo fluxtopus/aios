@@ -135,6 +135,37 @@ class AuthMiddleware:
         ).hexdigest()
         
         return hmac.compare_digest(signature, expected)
+
+    def _dev_bypass_user(self, token_matched: bool = False) -> AuthUser:
+        """Create a synthetic user for development auth bypass."""
+        return AuthUser(
+            id="dev",
+            auth_type=AuthType.NONE,
+            username="developer",
+            scopes=[],
+            metadata={
+                "auto_dev_user": True,
+                "dev_bypass_token_matched": token_matched,
+            },
+        )
+
+    def _resolve_dev_bypass_user(self, bearer_token: Optional[str] = None) -> Optional[AuthUser]:
+        """Return a bypass user if SEC-010 guards pass and token (if provided) matches."""
+        from src.core.config import is_dev_auth_bypass_allowed
+
+        if not is_dev_auth_bypass_allowed():
+            return None
+
+        expected_token = os.getenv("DEV_AUTH_BYPASS_TOKEN", "")
+        if bearer_token is None:
+            logger.info("Dev auth bypass active: injecting developer user")
+            return self._dev_bypass_user(token_matched=False)
+
+        if bearer_token == expected_token:
+            logger.info("Dev auth bypass active: accepted bypass bearer token")
+            return self._dev_bypass_user(token_matched=True)
+
+        return None
     
     async def authenticate(self, request: Request) -> Tuple[Optional[AuthUser], str]:
         """
@@ -207,7 +238,10 @@ class AuthMiddleware:
 
                         return user, AuthType.BEARER
                     else:
-                        # Token is invalid
+                        # Token is invalid. In development, allow explicit bypass token only.
+                        bypass_user = self._resolve_dev_bypass_user(token)
+                        if bypass_user:
+                            return bypass_user, AuthType.NONE
                         logger.warning("Token validation failed via inkPass")
                         from fastapi import HTTPException as _HTTPException
                         raise _HTTPException(
@@ -217,8 +251,14 @@ class AuthMiddleware:
 
                 except HTTPException:
                     # Re-raise HTTP exceptions
+                    bypass_user = self._resolve_dev_bypass_user(token)
+                    if bypass_user:
+                        return bypass_user, AuthType.NONE
                     raise
                 except Exception as e:
+                    bypass_user = self._resolve_dev_bypass_user(token)
+                    if bypass_user:
+                        return bypass_user, AuthType.NONE
                     logger.warning(f"Token validation error: {e}")
                     from fastapi import HTTPException as _HTTPException
                     raise _HTTPException(
@@ -314,18 +354,9 @@ class AuthMiddleware:
             user, auth_type = await self.authenticate(request)
 
             if not user:
-                # Optional development bypass only when explicitly enabled (SEC-010 hardened)
-                from src.core.config import is_dev_auth_bypass_allowed
-                dev_bypass = is_dev_auth_bypass_allowed()
-                if dev_bypass:
-                    user = AuthUser(
-                        id="dev",
-                        auth_type=AuthType.NONE,
-                        username="developer",
-                        scopes=[],
-                        metadata={"auto_dev_user": True}
-                    )
-                    logger.info("Dev auth bypass active: injecting developer user")
+                bypass_user = self._resolve_dev_bypass_user()
+                if bypass_user:
+                    user = bypass_user
                 else:
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -400,19 +431,10 @@ class AuthMiddleware:
             user, auth_type = await self.authenticate(request)
 
             if not user:
-                # Optional development bypass only when explicitly enabled (SEC-010 hardened)
-                from src.core.config import is_dev_auth_bypass_allowed
-                dev_bypass = is_dev_auth_bypass_allowed()
-                if dev_bypass:
-                    user = AuthUser(
-                        id="dev",
-                        auth_type=AuthType.NONE,
-                        username="developer",
-                        scopes=[],
-                        metadata={"auto_dev_user": True}
-                    )
+                bypass_user = self._resolve_dev_bypass_user()
+                if bypass_user:
+                    user = bypass_user
                     auth_type = AuthType.NONE
-                    logger.info("Dev auth bypass active: injecting developer user")
                 else:
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,

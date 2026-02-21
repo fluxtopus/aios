@@ -100,6 +100,11 @@ class Settings(BaseSettings):
     # MCP Configuration
     MCP_ENABLED: bool = True
     MCP_REGISTRY_PATH: str = "/app/config/mcp_registry.json"
+
+    # Inbox task tool wait behavior
+    INBOX_CREATE_TASK_WAIT_TIMEOUT_SECONDS: int = 90
+    INBOX_CREATE_TASK_WAIT_POLL_INTERVAL_SECONDS: float = 1.0
+    INBOX_CREATE_TASK_WAIT_MAX_TIMEOUT_SECONDS: int = 300
     
     # Monitoring
     ENABLE_METRICS: bool = True

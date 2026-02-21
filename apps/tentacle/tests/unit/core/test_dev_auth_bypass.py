@@ -11,7 +11,7 @@ Validates that:
 import os
 import logging
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 
 
 # ---------------------------------------------------------------------------
@@ -264,3 +264,53 @@ class TestAuthMiddlewareBypassIntegration:
                 with pytest.raises(HTTPException) as exc_info:
                     await auth_dep(mock_request)
                 assert exc_info.value.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_authenticate_accepts_matching_bypass_bearer_token(self, monkeypatch):
+        """When bypass is active, matching bearer token should be accepted."""
+        monkeypatch.setenv("DEV_AUTH_BYPASS", "true")
+        monkeypatch.setenv("DEV_AUTH_BYPASS_TOKEN", "test-token")
+
+        from src.api.auth_middleware import AuthMiddleware, AuthType
+
+        middleware = AuthMiddleware()
+
+        mock_request = MagicMock()
+        mock_request.headers = {"Authorization": "Bearer test-token"}
+        mock_request.state = MagicMock()
+
+        with patch("src.core.config.settings") as mock_settings:
+            mock_settings.APP_ENV = "development"
+            with patch("src.api.auth_middleware.token_cache.get", new=AsyncMock(return_value=None)):
+                with patch("src.api.auth_middleware.inkpass_validate_token", new=AsyncMock(return_value=None)):
+                    user, auth_type = await middleware.authenticate(mock_request)
+
+        assert user is not None
+        assert user.id == "dev"
+        assert user.metadata.get("auto_dev_user") is True
+        assert user.metadata.get("dev_bypass_token_matched") is True
+        assert auth_type == AuthType.NONE
+
+    @pytest.mark.asyncio
+    async def test_authenticate_rejects_nonmatching_bypass_bearer_token(self, monkeypatch):
+        """When bypass is active, non-matching bearer token should still be rejected."""
+        monkeypatch.setenv("DEV_AUTH_BYPASS", "true")
+        monkeypatch.setenv("DEV_AUTH_BYPASS_TOKEN", "test-token")
+
+        from src.api.auth_middleware import AuthMiddleware
+        from fastapi import HTTPException
+
+        middleware = AuthMiddleware()
+
+        mock_request = MagicMock()
+        mock_request.headers = {"Authorization": "Bearer different-token"}
+        mock_request.state = MagicMock()
+
+        with patch("src.core.config.settings") as mock_settings:
+            mock_settings.APP_ENV = "development"
+            with patch("src.api.auth_middleware.token_cache.get", new=AsyncMock(return_value=None)):
+                with patch("src.api.auth_middleware.inkpass_validate_token", new=AsyncMock(return_value=None)):
+                    with pytest.raises(HTTPException) as exc_info:
+                        await middleware.authenticate(mock_request)
+
+        assert exc_info.value.status_code == 401

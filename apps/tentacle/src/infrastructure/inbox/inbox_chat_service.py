@@ -165,6 +165,14 @@ class InboxChatService:
             tool_context["user_token"] = user_token
         if file_references:
             tool_context["file_references"] = file_references
+        try:
+            tool_context["task_use_cases"] = await _get_task_use_cases()
+            tool_context["checkpoint_use_cases"] = await _get_checkpoint_use_cases()
+        except Exception as e:
+            logger.warning(
+                "Failed to attach task/checkpoint use cases to tool context",
+                error=str(e),
+            )
 
         # 7. Call LLM with tool calling
         try:

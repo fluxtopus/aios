@@ -8,9 +8,32 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 import structlog
 
+from src.application.checkpoints import CheckpointUseCases
+from src.application.tasks import TaskUseCases
+from src.application.tasks.providers import (
+    get_checkpoint_use_cases as provider_get_checkpoint_use_cases,
+    get_task_use_cases as provider_get_task_use_cases,
+)
 from .base import BaseTool, ToolDefinition, ToolResult
 
 logger = structlog.get_logger(__name__)
+
+_task_use_cases: Optional[TaskUseCases] = None
+_checkpoint_use_cases: Optional[CheckpointUseCases] = None
+
+
+async def _get_task_use_cases() -> TaskUseCases:
+    global _task_use_cases
+    if _task_use_cases is None:
+        _task_use_cases = await provider_get_task_use_cases()
+    return _task_use_cases
+
+
+async def _get_checkpoint_use_cases() -> CheckpointUseCases:
+    global _checkpoint_use_cases
+    if _checkpoint_use_cases is None:
+        _checkpoint_use_cases = await provider_get_checkpoint_use_cases()
+    return _checkpoint_use_cases
 
 
 class GetTaskStatusTool(BaseTool):
@@ -97,6 +120,8 @@ If no task_id is provided, shows all active tasks and pending checkpoints."""
         # Get required context
         user_id = context.get("user_id")
         delegation_service = context.get("delegation_service")
+        task_use_cases = context.get("task_use_cases")
+        checkpoint_use_cases = context.get("checkpoint_use_cases")
 
         if not user_id:
             return ToolResult(
@@ -104,7 +129,19 @@ If no task_id is provided, shows all active tasks and pending checkpoints."""
                 error="User context not available",
             )
 
-        if not delegation_service:
+        if not delegation_service and not task_use_cases:
+            try:
+                task_use_cases = await _get_task_use_cases()
+            except Exception as exc:
+                logger.warning("Failed to resolve task use cases", error=str(exc))
+
+        if include_checkpoints and not delegation_service and not checkpoint_use_cases:
+            try:
+                checkpoint_use_cases = await _get_checkpoint_use_cases()
+            except Exception as exc:
+                logger.warning("Failed to resolve checkpoint use cases", error=str(exc))
+
+        if not delegation_service and not task_use_cases:
             return ToolResult(
                 success=False,
                 error="Delegation service not available",
@@ -113,7 +150,10 @@ If no task_id is provided, shows all active tasks and pending checkpoints."""
         try:
             # If specific plan requested
             if plan_id:
-                plan = await delegation_service.get_plan(plan_id)
+                if delegation_service:
+                    plan = await delegation_service.get_plan(plan_id)
+                else:
+                    plan = await task_use_cases.get_task(plan_id)
 
                 if not plan:
                     return ToolResult(
@@ -131,28 +171,45 @@ If no task_id is provided, shows all active tasks and pending checkpoints."""
 
                 # Add checkpoint info if pending
                 if include_checkpoints:
-                    checkpoints = await delegation_service.get_pending_checkpoints(user_id)
-                    plan_checkpoints = [c for c in checkpoints if c.plan_id == plan_id]
+                    if delegation_service:
+                        checkpoints = await delegation_service.get_pending_checkpoints(user_id)
+                    elif checkpoint_use_cases:
+                        checkpoints = await checkpoint_use_cases.list_pending_for_task(plan_id)
+                    else:
+                        checkpoints = []
+                    plan_checkpoints = [
+                        c
+                        for c in checkpoints
+                        if getattr(c, "plan_id", getattr(c, "task_id", None)) == plan_id
+                    ]
                     if plan_checkpoints:
                         result_data["pending_checkpoints"] = [
                             self._format_checkpoint(c) for c in plan_checkpoints
                         ]
 
+                status_value = self._status_value(getattr(plan, "status", None))
                 return ToolResult(
                     success=True,
                     data=result_data,
-                    message=f"Task '{plan.goal[:50]}...' is {plan.status.value}",
+                    message=f"Task '{plan.goal[:50]}...' is {status_value}",
                 )
 
             # List all tasks
             from src.domain.tasks.models import TaskStatus
 
             # Get active tasks
-            active_plans = await delegation_service.get_user_plans(
-                user_id=user_id,
-                status=None,  # All statuses initially
-                limit=limit,
-            )
+            if delegation_service:
+                active_plans = await delegation_service.get_user_plans(
+                    user_id=user_id,
+                    status=None,  # All statuses initially
+                    limit=limit,
+                )
+            else:
+                active_plans = await task_use_cases.list_tasks(
+                    user_id=user_id,
+                    status=None,
+                    limit=limit,
+                )
 
             # Filter to active statuses
             active_statuses = {
@@ -161,20 +218,35 @@ If no task_id is provided, shows all active tasks and pending checkpoints."""
                 TaskStatus.EXECUTING,
                 TaskStatus.CHECKPOINT,
             }
+            active_status_values = {self._status_value(s) for s in active_statuses}
+            terminal_status_values = {
+                self._status_value(TaskStatus.COMPLETED),
+                self._status_value(TaskStatus.FAILED),
+                self._status_value(TaskStatus.CANCELLED),
+            }
 
-            active_tasks = [p for p in active_plans if p.status in active_statuses]
+            active_tasks = [
+                p
+                for p in active_plans
+                if self._status_value(getattr(p, "status", None)) in active_status_values
+            ]
             completed_tasks = []
 
             if include_completed:
                 completed_tasks = [
                     p for p in active_plans
-                    if p.status in {TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED}
+                    if self._status_value(getattr(p, "status", None)) in terminal_status_values
                 ][:5]  # Limit completed to 5
 
             # Get pending checkpoints
             pending_checkpoints = []
             if include_checkpoints:
-                checkpoints = await delegation_service.get_pending_checkpoints(user_id)
+                if delegation_service:
+                    checkpoints = await delegation_service.get_pending_checkpoints(user_id)
+                elif checkpoint_use_cases:
+                    checkpoints = await checkpoint_use_cases.list_pending(user_id)
+                else:
+                    checkpoints = []
                 pending_checkpoints = [self._format_checkpoint(c) for c in checkpoints]
 
             result_data = {
@@ -225,19 +297,28 @@ If no task_id is provided, shows all active tasks and pending checkpoints."""
 
     def _format_plan(self, plan) -> Dict[str, Any]:
         """Format a plan for display."""
+        steps = getattr(plan, "steps", []) or []
         completed_steps = sum(
-            1 for s in plan.steps if s.status.value == "completed"
+            1 for s in steps if self._status_value(getattr(s, "status", None)) in {"done", "completed"}
         )
         failed_steps = sum(
-            1 for s in plan.steps if s.status.value == "failed"
+            1 for s in steps if self._status_value(getattr(s, "status", None)) == "failed"
         )
+        status_value = self._status_value(getattr(plan, "status", None))
+
+        progress = 0.0
+        try:
+            progress = float(plan.get_progress_percentage())
+        except Exception:
+            if steps:
+                progress = round((completed_steps / len(steps)) * 100, 2)
 
         return {
             "plan_id": plan.id,
             "goal": plan.goal,
-            "status": plan.status.value,
-            "progress": plan.get_progress_percentage(),
-            "steps_total": len(plan.steps),
+            "status": status_value,
+            "progress": progress,
+            "steps_total": len(steps),
             "steps_completed": completed_steps,
             "steps_failed": failed_steps,
             "created_at": plan.created_at.isoformat() if plan.created_at else None,
@@ -247,7 +328,7 @@ If no task_id is provided, shows all active tasks and pending checkpoints."""
     def _format_checkpoint(self, checkpoint) -> Dict[str, Any]:
         """Format a checkpoint for display."""
         return {
-            "plan_id": checkpoint.plan_id,
+            "plan_id": getattr(checkpoint, "plan_id", getattr(checkpoint, "task_id", None)),
             "step_id": checkpoint.step_id,
             "name": checkpoint.checkpoint_name,
             "description": checkpoint.description,
@@ -255,3 +336,8 @@ If no task_id is provided, shows all active tasks and pending checkpoints."""
             "created_at": checkpoint.created_at.isoformat() if checkpoint.created_at else None,
             "expires_at": checkpoint.expires_at.isoformat() if checkpoint.expires_at else None,
         }
+
+    @staticmethod
+    def _status_value(status: Any) -> str:
+        raw = getattr(status, "value", status)
+        return str(raw).lower() if raw is not None else "unknown"
