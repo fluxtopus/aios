@@ -17,21 +17,19 @@ Official Python SDK for inkPass - Authentication & Authorization Service
 
 ## Installation
 
+### From PyPI (Recommended)
+
+```bash
+uv add inkpass-sdk
+# or: pip install inkpass-sdk
+```
+
 ### From Source (Development)
 
 ```bash
 # From the monorepo root:
 cd packages/inkpass-sdk-python
-
-# Install in development mode
 pip install -e ".[dev]"
-```
-
-### From Package (Production)
-
-```bash
-# Once published to PyPI
-pip install inkpass-sdk
 ```
 
 ## Quick Start

@@ -4,12 +4,17 @@ Shared Stripe integration package used by services in this repo.
 
 ## Installation
 
-```bash
-# For development (editable install)
-pip install -e packages/fluxos-stripe
+Install from PyPI (recommended):
 
-# Or add to requirements.txt
--e ./packages/fluxos-stripe
+```bash
+uv add fluxos-stripe
+# or: pip install fluxos-stripe
+```
+
+Local editable install (repo development):
+
+```bash
+pip install -e packages/fluxos-stripe
 ```
 
 ## Quick Start

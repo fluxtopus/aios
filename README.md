@@ -106,6 +106,7 @@ docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 - Tentacle: `apps/tentacle/README.md`
 - InkPass: `apps/inkpass/README.md`
 - Mimic: `apps/mimic/README.md`
+- Python packages (PyPI + `uv`): `docs/python-packages.md`
 - Package release skill: `skills/fluxos-agent-package-maintainer/SKILL.md`
 
 ## 🔒 Security

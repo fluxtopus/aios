@@ -4,7 +4,17 @@ Python SDK for Mimic Notification Service.
 
 ## Installation
 
+From PyPI (recommended):
+
 ```bash
+uv add mimic-sdk
+# or: pip install mimic-sdk
+```
+
+From source (repo development):
+
+```bash
+cd packages/mimic-sdk-python
 pip install -e .
 ```
 
@@ -50,4 +60,3 @@ asyncio.run(main())
 ## Examples
 
 See `examples/` directory for more examples.
-
