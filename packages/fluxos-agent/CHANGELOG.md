@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `flux-agent` should be documented in this file.
+All notable changes to `fluxos-agent` should be documented in this file.
 
 ## [0.1.0] - 2026-02-15
 

@@ -65,4 +65,4 @@ pre-commit==3.5.0
 # Local monorepo packages
 -e ../../packages/inkpass-sdk-python
 -e ../../packages/mimic-sdk-python
--e ../../packages/flux-agent
+-e ../../packages/fluxos-agent

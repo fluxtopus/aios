@@ -1,0 +1,3 @@
+component: app-tentacle
+bump: patch
+summary: "Update Tentacle local package references and production image builds to use packages/fluxos-agent."

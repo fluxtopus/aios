@@ -1,8 +1,8 @@
-# flux-agent
+# fluxos-agent
 
 Python port of `pi-mono/packages/agent` [https://github.com/badlogic/pi-mono/tree/main/packages/agent].
 
-`flux-agent` provides:
+`fluxos-agent` provides:
 - Stateful agent runtime (`Agent`) with prompt/continue flows
 - Agent loop primitives (`agent_loop`, `agent_loop_continue`)
 - Tool execution with streaming update events
@@ -12,7 +12,7 @@ Python port of `pi-mono/packages/agent` [https://github.com/badlogic/pi-mono/tre
 ## Installation
 
 ```bash
-pip install -e packages/flux-agent
+pip install -e packages/fluxos-agent
 ```
 
 ## Quick Start
@@ -76,7 +76,7 @@ asyncio.run(main())
 ## Testing
 
 ```bash
-cd packages/flux-agent
+cd packages/fluxos-agent
 pip install -e ".[dev]"
 pytest tests/unit -v
 ```

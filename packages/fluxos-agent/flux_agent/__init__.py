@@ -1,4 +1,4 @@
-"""flux-agent - Stateful agent loop and runtime for Python."""
+"""fluxos-agent - Stateful agent loop and runtime for Python."""
 
 from .agent import Agent, AgentOptions
 from .agent_loop import agent_loop, agent_loop_continue

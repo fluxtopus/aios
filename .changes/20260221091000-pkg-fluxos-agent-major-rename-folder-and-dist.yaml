@@ -1,0 +1,3 @@
+component: pkg-fluxos-agent
+bump: major
+summary: "Rename agent package folder and distribution from flux-agent to fluxos-agent while keeping flux_agent import path stable."
