@@ -11,6 +11,15 @@ Python port of `pi-mono/packages/agent` [https://github.com/badlogic/pi-mono/tre
 
 ## Installation
 
+Install from PyPI (recommended):
+
+```bash
+uv add fluxos-agent
+# or: pip install fluxos-agent
+```
+
+Local editable install (repo development):
+
 ```bash
 pip install -e packages/fluxos-agent
 ```
