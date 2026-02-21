@@ -55,18 +55,18 @@ components:
     image_repository: ghcr.io/fluxtopus/flux-mimic
     dockerfile: apps/mimic/Dockerfile.prod
 
-  - name: pkg-flux-agent
-    scope: flux-agent
+  - name: pkg-fluxos-agent
+    scope: fluxos-agent
     kind: python-package
     path_globs:
-      - packages/flux-agent/**
+      - packages/fluxos-agent/**
     version:
       kind: pyproject
-      file: packages/flux-agent/pyproject.toml
+      file: packages/fluxos-agent/pyproject.toml
     runtime_version_files:
-      - packages/flux-agent/flux_agent/version.py
-    changelog: packages/flux-agent/CHANGELOG.md
-    publish_dir: packages/flux-agent
+      - packages/fluxos-agent/flux_agent/version.py
+    changelog: packages/fluxos-agent/CHANGELOG.md
+    publish_dir: packages/fluxos-agent
 
   - name: pkg-fluxos-stripe
     scope: fluxos-stripe

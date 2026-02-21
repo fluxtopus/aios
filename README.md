@@ -49,7 +49,7 @@ fluxos/
 │   ├── mimic-ui/              # Notification UI
 │   └── fluxos-landing/          # Marketing site
 ├── packages/                  # Shared SDKs and utilities
-│   ├── flux-agent/
+│   ├── fluxos-agent/
 │   ├── inkpass-sdk-python/
 │   ├── mimic-sdk-python/
 │   └── fluxos-stripe/

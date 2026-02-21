@@ -23,7 +23,7 @@ RUN awk '!/^-e \.\.\/\.\.\/packages\//' requirements.txt > /tmp/requirements-no-
     && pip install --user --no-cache-dir \
         /packages/inkpass-sdk-python \
         /packages/mimic-sdk-python \
-        /packages/flux-agent
+        /packages/fluxos-agent
 
 # Install gunicorn for production
 RUN pip install --user --no-cache-dir gunicorn
