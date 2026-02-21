@@ -1,5 +1,15 @@
 # Platform Changelog
 
+## platform-2026.02.21.1 (2026-02-21)
+
+### Version bumps
+
+- `app-tentacle`: `0.1.2` -> `0.1.3` (patch)
+
+### Included changes
+
+- `app-tentacle` (patch): Stabilize inbox task tool orchestration: wait/poll behavior, get_task_status fallback wiring, and task observe streaming fix. [`20260221000000-app-tentacle-inbox-async-task-tooling.yaml`]
+
 ## platform-2026.02.18.1 (2026-02-18)
 
 ### Version bumps

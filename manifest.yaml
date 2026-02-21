@@ -1,7 +1,7 @@
 schema_version: 2
-generated_at: '2026-02-18T05:35:00Z'
-platform_release: platform-2026.02.18.1
-git_sha: fb9e856b312eef0dcf56798862c34e6505f14884
+generated_at: '2026-02-21T16:47:15Z'
+platform_release: platform-2026.02.21.1
+git_sha: 380f3b5b8c773838b02899d1746898445f9a474f
 components:
   app-inkpass:
     scope: inkpass
@@ -26,10 +26,10 @@ components:
   app-tentacle:
     scope: tentacle
     kind: app
-    version: 0.1.2
+    version: 0.1.3
     version_sources:
     - apps/tentacle/VERSION
-    version_sources_digest: bb8b39b7b58c91b57aadcf80c0f3e3f4f5c4fe74ea61229b98d786fe37879f54
+    version_sources_digest: 2017d29b79d311befccaad5f9a517f7e0c8d18c637be2a3fc1f3e808bc8c64c6
     artifact:
       image_repository: ghcr.io/fluxtopus/flux-tentacle
       dockerfile: apps/tentacle/Dockerfile.prod
